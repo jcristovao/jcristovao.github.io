@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <meta charset="utf-8">
+    <title>Fun Deps: Haskell Cheat Sheets (Part 1)</title>
+	<link rel="shortcut icon" type="image/x-icon" href="favicon.ico" />
+    <link href="http://fonts.googleapis.com/css?family=Ubuntu" rel="stylesheet" type="text/css">
+    <link href="http://fonts.googleapis.com/css?family=Oxygen" rel="stylesheet" type="text/css">
+    <!-- Bootstrap -->
+    <link href="../../../css/bootstrap.min.css" rel="stylesheet">
+    <link href="../../../css/syntax.css" rel="stylesheet">
+    <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
+    <script src="https://code.jquery.com/jquery.js"></script>
+    <!-- Include all compiled plugins (below), or include individual files as needed -->
+    <script src="../../../js/bootstrap.min.js"></script>
+    <!-- Update email -->
+	<script src="../../../js/eml.js"></script>
+    <style>
+      html,body, #body {
+        height:100%;
+      }
+      .container {
+        width: 100%;
+        -moz-box-sizing: border-box;
+        box-sizing: border-box;
+        overflow:hidden;
+        min-height: 100%;
+        padding: 0 15px;
+      }
+      .content, .sidebar {
+        padding-bottom:99999px;
+        margin-bottom:-99999px;
+      }
+      .content { background-color: white; }
+      .sidebar { background-color: cyan; }
+      .brd 
+        {
+          border-right-style:solid;
+          border-right: solid thin #CCCCCC;
+          background-color: #F0F0F0;
+        } 
+
+      article {
+        margin-bottom: 2em;
+      }
+      
+    </style>
+  </head>
+
+  <body onload="javascript: document.getElementsByClassName('mll').href='mailto:jcristovao@gmail.com';">
+  <div class="container">
+    <div id="body" class="row">
+      <div class="col-lg-2 col-md-2 col-sm-2 col-xs-3 sidebar text-right brd">
+        <div class="row"> </div>
+        <div class="row center-block">
+          <a href="../../../"><img src="../../../images/fundeps2.png" alt="fundeps"></a>
+        </div>
+        <div class="row"> </div>
+        <div class="row-center-block">
+          <h3>
+			  <strong><a href="../../../about.html">About</a></strong>
+		  </h3>
+        </div>
+          <div class="row center-block">
+            <h5>
+				<strong>
+					<a href="https://github.com/jcristovao">GitHub</a>
+				</strong> 
+				<!--<span class="small glyphicon glyphicon-star" />-->
+			</h5>
+          </div>
+          <div class="row center-block">
+            <h5>
+				<strong>
+					<a href="http://pt.linkedin.com/in/joaocristovao/">LinkedIn</a>
+				</strong> 
+				<!--<span class="small glyphicon glyphicon-star" />-->
+			</h5>
+          </div>
+
+          <div class="row center-block">
+            <!--<h5>-->
+				<!--<strong>-->
+					<!--<a href="/">Links</a>-->
+				<!--</strong>-->
+				<!--<span class="small glyphicon glyphicon-share" />-->
+			<!--</h5>-->
+          </div>
+          <!--<div class="row-center-block">-->
+            <!--<h5><strong><a href="/">Donate</a></strong> <span class="small glyphicon glyphicon-thumbs-up"></span></h5>-->
+          <!--</div>-->
+	    <div class="row-center-block">
+          <h3>
+			  <strong><a href="../../../categories.html">Categories</a></strong>
+		  </h3>
+        </div>
+		<div class="row-center-block">
+			
+				<a href="../../../tags/cheatsheets.html">cheatsheets (1)</a>
+			
+	    <div class="row-center-block">
+          <h3>
+			  <strong><a href="../../../tags.html">Tags</a></strong>
+		  </h3>
+        </div>
+			
+				<a href="../../../tags/cheatsheet.html">cheatsheet (1)</a><br /> <a href="../../../tags/haskell.html">haskell (1)</a><br /> <a href="../../../tags/typeclass.html">typeclass (1)</a>
+			
+		</div>
+        <div class="row-center-block">
+			<h3><strong><a href="../../../archive.html">Archives</a></strong></h3>
+        </div>
+		<div class="row center-block">
+		  
+		</div>
+
+      </div>
+      <div class="col-lg-8 col-md-8 col-sm-8 col-xs-9 content">
+        <article>
+          <h2>Haskell Cheat Sheets (Part 1)
+            <small class="pull-right">
+              
+                2014-03-04
+              
+            </small></h2>
+		<h4>	
+			<small class="pull-right">
+				
+					<a href="../../../tags/haskell.html">haskell</a>, <a href="../../../tags/cheatsheet.html">cheatsheet</a>, <a href="../../../tags/typeclass.html">typeclass</a>
+				
+			</small>
+		</h4>
+		  
+
+          <p><em>tl;dr:</em> : see <a href="../../../tables/FromSemigroupToMonads.pdf">this</a>.</p>
+<p>If you look for Haskell cheat sheets on the web, you get:</p>
+<ul>
+<li><a href="http://cheatsheet.codeslower.com/CheatSheet.pdf">Code Slower 14 pages cheat sheet</a></li>
+<li><a href="http://www.haskell.org/haskellwiki/Reference_card">Haskell Wiki Reference Card</a></li>
+<li><a href="http://www.cheat-sheets.org/saved-copy/Haskell.Haskell_Cheat_Sheet.pdf">A short one with the basics</a></li>
+<li><a href="https://wincent.com/wiki/Haskell_cheat_sheet">And another one</a></li>
+<li><a href="https://github.com/rudymatela/ultimate-cheat-sheets">Ultimate Haskell Cheat Sheet</a></li>
+</ul>
+<p>Personally, I find none of them particular useful. While the last three are useful for the absolute beginner, it seems that there’s a gap from there forward.</p>
+<p>Of course, the usual answer is <a href="https://stackoverflow.com/questions/1162360/haskell-function-cheat-sheet">why do you need a cheat sheet, if there is hoogle</a>, but while <a href="http://www.haskell.org/hoogle/">hoogle</a> and <a href="http://holumbus.fh-wedel.de/hayoo/hayoo.html">hayoo</a> are great, they only help you when you know what you are looking for exactly, namely the type signature.</p>
+<p>Sometimes, it is useful to just have a lot information condensed in such a way that’s easy to analyse, so that you can make informed decisions or just easily discover additional functions.</p>
+<p>With that purpose in mind, I plan to launch some Haskell cheat sheets, with different levels of complexity and applicability, but with some clear goals in mind:</p>
+<ul>
+<li>Succinct</li>
+<li>Ready to print, for the paper lovers like me</li>
+<li>Frequently updated and thus, one expects, always correct</li>
+</ul>
+<p>The first Haskell sheet cheat I’ll be releasing is one were I illustrate:</p>
+<ul>
+<li><a href="http://hackage.haskell.org/package/semigroups">Semigroup</a> , <a href="http://hackage.haskell.org/package/base-4.6.0.1/docs/Data-Monoid.html">Monoid</a> , <a href="http://hackage.haskell.org/package/semigroupoids-4.0/docs/Data-Functor-Alt.html">Alt</a> , <a href="http://hackage.haskell.org/package/semigroupoids-4.0/docs/Data-Functor-Plus.html">Plus</a> , <a href="http://hackage.haskell.org/package/semigroupoids-4.0/docs/Data-Functor-Apply.html">Apply</a> , <a href="http://hackage.haskell.org/package/base-4.6.0.1/docs/Control-Applicative.html#t:Applicative">Applicative</a> , <a href="http://hackage.haskell.org/package/base-4.6.0.1/docs/Control-Applicative.html#t:Alternative">Alternative</a> , <a href="http://hackage.haskell.org/package/semigroupoids-4.0/docs/Data-Functor-Bind.html">Bind</a> , <a href="http://hackage.haskell.org/package/base-4.6.0.1/docs/Control-Monad.html#t:Monad">Monad</a> , <a href="http://hackage.haskell.org/package/base-4.6.0.1/docs/Control-Monad.html#t:MonadPlus">MonadPlus</a> hierarchy</li>
+<li>Fundamental operations supported by each type class</li>
+<li>Semantics of the binary operation (Choice, Combination, Both, Neither)</li>
+<li>Type Class restrictions</li>
+</ul>
+<div class="figure">
+<img src="../../../images/fromsemigroup.png" />
+</div>
+<p>You can get it <a href="../../../tables/FromSemigroupToMonads.pdf">here</a>.</p>
+<p>These tables were made incrementally as I was learning each type class. They are still incomplete (namely the second page is still a partial copy-paste of the first), and they are - get ready to puke - in <a href="https://github.com/jcristovao/haskell-cheatsheets">LibreOffice format</a>, not Latex. But for these really complex tables I find it more useful: but I’m open to suggestions.</p>
+<p>There are probably some lingering errors, and the table were not, unfortunately, made through automated code analysis. I would very much like that, but right now I see it as a very time consuming task…</p>
+<p>Please feel free to identify mistakes, make suggestions or otherwise give your feedback on these. The original file is <a href="https://github.com/jcristovao/haskell-cheatsheets">at GitHub</a>.</p>
+<p>Thanks!</p>
+
+          <footer class="pull-right small">
+            <a class="mll">
+              
+                João Cristóvão
+              
+            </a>
+          </footer>
+        </article>
+        
+      </div>
+      <div class="col-lg-2 col-md-2 col-sm-2 col-xs-1">
+         
+      </div>
+
+    </div>
+  </div>
+  </body>
+</html>
+
