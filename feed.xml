@@ -8,6 +8,148 @@
         <name>Joao Cristovao</name>
         <email>jmacristovao@gmail.com</email>
     </author>
-    <updated>Unknown</updated>
-    
+    <updated>2014-03-05T00:00:00Z</updated>
+    <entry>
+    <title>From semigroups to bind</title>
+    <link href="http://fundeps.com/posts/haskell/2014-03-05-from-semigroup-to-bind/index.html" />
+    <id>http://fundeps.com/posts/haskell/2014-03-05-from-semigroup-to-bind/index.html</id>
+    <published>2014-03-05T00:00:00Z</published>
+    <updated>2014-03-05T00:00:00Z</updated>
+    <summary type="html"><![CDATA[<p><em>tl;dr:</em> : what are Alt, Apply, Bind typeclasses</p>
+<p>So, the one common comment I received on my first <a href="http://fundeps.com/posts/cheatsheets/2014-03-04-cheat-sheets/">haskell cheatsheet</a> was: it looks great, but I have no idea what half of those typeclasses are.</p>
+<p>So, I guess an explanation is due.</p>
+<p>My first glimpse of understanding came from this <a href="http://hackage.haskell.org/package/semigroupoids">beautiful ASCII art</a>, which I’ll reproduce here:</p>
+<pre><code> Traversable &lt;---- Foldable &lt;--- Functor ------&gt; Alt ---------&gt; Plus           Semigroupoid
+      |               |            |                              |                  |
+      v               v            v                              v                  v
+ Traversable1 &lt;--- Foldable1     Apply --------&gt; Applicative -&gt; Alternative      Category
+                                   |               |              |                  |
+                                   v               v              v                  v
+                                 Bind ---------&gt; Monad -------&gt; MonadPlus          Arrow
+</code></pre>
+<p>So, for the regular haskeller without a background in mathematics,this is what it is usually known:</p>
+<p><strong>Monoid</strong>:</p>
+<pre class="sourceCode Haskell"><code class="sourceCode haskell"><span class="kw">class</span> <span class="dt">Monoid</span> a <span class="kw">where</span>
+<span class="ot">        mempty  ::</span> a
+        <span class="co">-- ^ Identity of &#39;mappend&#39;</span>
+<span class="ot">        mappend ::</span> a <span class="ot">-&gt;</span> a <span class="ot">-&gt;</span> a
+        <span class="co">-- ^ An associative operation</span>
+<span class="ot">        mconcat ::</span> [a] <span class="ot">-&gt;</span> a</code></pre>
+<p><strong>Functor</strong>:</p>
+<pre class="sourceCode Haskell"><code class="sourceCode haskell"><span class="kw">class</span> <span class="dt">Functor</span> f <span class="kw">where</span>
+<span class="ot">    fmap ::</span> (a <span class="ot">-&gt;</span> b) <span class="ot">-&gt;</span> f a <span class="ot">-&gt;</span> f b</code></pre>
+<p><strong>Applicative:</strong></p>
+<pre class="sourceCode Haskell"><code class="sourceCode haskell"><span class="kw">class</span> <span class="dt">Functor</span> f <span class="ot">=&gt;</span> <span class="dt">Applicative</span> f <span class="kw">where</span>
+    <span class="co">-- | Lift a value.</span>
+<span class="ot">    pure ::</span> a <span class="ot">-&gt;</span> f ak
+
+    <span class="co">-- | Sequential application.</span>
+<span class="ot">    (&lt;*&gt;) ::</span> f (a <span class="ot">-&gt;</span> b) <span class="ot">-&gt;</span> f a <span class="ot">-&gt;</span> f b</code></pre>
+<p><strong>Alternative</strong>:</p>
+<pre class="sourceCode Haskell"><code class="sourceCode haskell"><span class="kw">class</span> <span class="dt">Applicative</span> f <span class="ot">=&gt;</span> <span class="dt">Alternative</span> f <span class="kw">where</span>
+    <span class="co">-- | The identity of &#39;&lt;|&gt;&#39;</span>
+<span class="ot">    empty ::</span> f a
+    <span class="co">-- | An associative binary operation</span>
+<span class="ot">    (&lt;|&gt;) ::</span> f a <span class="ot">-&gt;</span> f a <span class="ot">-&gt;</span> f a</code></pre>
+<h2 id="so-what-are-all-those-new-typeclasses">So, what are all those new typeclasses?</h2>
+<h4 id="first-question-what-can-i-get-if-i-remove-the-identity-from-a-monoid">First question: <strong>what can I get if I remove the identity (from a Monoid)</strong>?</h4>
+<p>You get a <a href="http://hackage.haskell.org/package/semigroups"><strong>semigroup</strong></a></p>
+<pre class="sourceCode Haskell"><code class="sourceCode haskell"><span class="kw">class</span> <span class="dt">Semigroup</span> a <span class="kw">where</span>
+  <span class="co">-- | An associative operation.</span>
+<span class="ot">  (&lt;&gt;) ::</span> a <span class="ot">-&gt;</span> a <span class="ot">-&gt;</span> a</code></pre>
+<p><em>But, what does it do, that a monoid doesn’t?</em></p>
+<p>It gives you <a href="http://hackage.haskell.org/package/semigroups-0.12.2/docs/Data-Semigroup.html#t:Min">Min</a> and <a href="http://hackage.haskell.org/package/semigroups-0.12.2/docs/Data-Semigroup.html#t:Max">Max</a>. This would not be possible with a monoid. What’s the identity of a Maximum? Do you want to define that?</p>
+<p>Plus, you get <a href="http://hackage.haskell.org/package/semigroups-0.12.2/docs/Data-List-NonEmpty.html">more instances</a> than you get with monoids.</p>
+<h4 id="second-question-what-can-i-get-if-i-remove-the-empty-from-an-alternative">Second question: <strong>what can I get if I remove the empty (from an Alternative)</strong>?</h4>
+<h5 id="bonus-question-can-i-get-something-that-behaves-like-an-alternative-just-with-a-functor-constraint">Bonus question: <strong>can I get something that behaves like an alternative, just with a Functor constraint?</strong></h5>
+<p><em>Yes: It’s called an <a href="http://hackage.haskell.org/package/semigroupoids-4.0/docs/Data-Functor-Alt.html">Alt</a></em>:</p>
+<pre class="sourceCode Haskell"><code class="sourceCode haskell"><span class="kw">class</span> <span class="dt">Functor</span> f <span class="ot">=&gt;</span> <span class="dt">Alt</span> f <span class="kw">where</span>
+  <span class="co">-- | @(&lt;|&gt;)@ without a required @empty@</span>
+<span class="ot">    (&lt;!&gt;) ::</span> f a <span class="ot">-&gt;</span> f a <span class="ot">-&gt;</span> f a</code></pre>
+<p><em>But, what does it do, that a alternative doesn’t?</em></p>
+<p>It allows you to include some extra types, like <a href="http://hackage.haskell.org/package/base-4.6.0.1/docs/Data-Either.html">Either</a> or IO. Thus, you can write stuff like</p>
+<pre class="sourceCode Haskell"><code class="sourceCode haskell">(<span class="fu">...</span>)
+<span class="kw">do</span>
+	<span class="co">-- IOAction1 `orElse` IOAction2</span>
+	xpto <span class="ot">&lt;-</span> <span class="dt">IOAction1</span> <span class="fu">&lt;!&gt;</span> <span class="dt">IOAction2</span></code></pre>
+<h4 id="third-question-what-can-i-get-if-i-remove-the-pure-from-an-applicative">Third question: <strong>what can I get if I remove the pure from an Applicative</strong>?</h4>
+<p>An <a href="http://hackage.haskell.org/package/semigroupoids-4.0/docs/Data-Functor-Apply.html#t:Apply">Apply</a>:</p>
+<pre class="sourceCode Haskell"><code class="sourceCode haskell"><span class="co">-- &gt; associative composition: (.) &lt;$&gt; u &lt;.&gt; v &lt;.&gt; w = u &lt;.&gt; (v &lt;.&gt; w)</span>
+<span class="kw">class</span> <span class="dt">Functor</span> f <span class="ot">=&gt;</span> <span class="dt">Apply</span> f <span class="kw">where</span>
+<span class="ot">  (&lt;.&gt;) ::</span> f (a <span class="ot">-&gt;</span> b) <span class="ot">-&gt;</span> f a <span class="ot">-&gt;</span> f b</code></pre>
+<p><em>But, what does it do, that a alternative doesn’t?</em></p>
+<p>It allows you to include some extra types, like <a href="http://hackage.haskell.org/package/containers-0.5.4.0/docs/Data-IntMap-Lazy.html">IntMap</a></p>
+<h4 id="fourth-question-what-can-i-get-if-i-remove-the-return-from-a-monad">Fourth question: <strong>what can I get if I remove the return from a Monad</strong>?</h4>
+<p>A <a href="http://hackage.haskell.org/package/semigroupoids-4.0/docs/Data-Functor-Bind.html#t:Bind">Bind</a></p>
+<pre class="sourceCode Haskell"><code class="sourceCode haskell"><span class="kw">class</span> <span class="dt">Apply</span> m <span class="ot">=&gt;</span> <span class="dt">Bind</span> m <span class="kw">where</span>
+<span class="ot">  (&gt;&gt;-) ::</span> m a <span class="ot">-&gt;</span> (a <span class="ot">-&gt;</span> m b) <span class="ot">-&gt;</span> m b
+  m <span class="fu">&gt;&gt;-</span> f <span class="fu">=</span> join (fmap f m)
+
+<span class="ot">  join ::</span> m (m a) <span class="ot">-&gt;</span> m a
+  join <span class="fu">=</span> (<span class="fu">&gt;&gt;-</span> id)</code></pre>
+<p><em>But, what does it do, that a monad doesn’t?</em></p>
+<p>It allows you to include some extra types, like <a href="http://hackage.haskell.org/package/containers-0.5.4.0/docs/Data-IntMap-Lazy.html">IntMap</a></p>
+<h4 id="fifth-question-can-i-add-a-zero-value-to-alt">Fifth question: <strong>Can I add a <code>zero</code> value to Alt</strong>?</h4>
+<p>Well, this one does seem a little bit far fetched, doesn’t it, since one of the steps of defining Alt was precisely to drop the empty… but, not just that (also just depending on Functor, and not Applicative instances). Hence, <code>zero</code> arrives. Once again, you do gain some extra instances (for example):</p>
+<pre class="sourceCode Haskell"><code class="sourceCode haskell"><span class="kw">instance</span> <span class="dt">Plus</span> <span class="dt">IO</span> <span class="kw">where</span>
+  zero <span class="fu">=</span> error <span class="st">&quot;zero&quot;</span>
+
+<span class="kw">instance</span> <span class="dt">Ord</span> k <span class="ot">=&gt;</span> <span class="dt">Plus</span> (<span class="dt">Map</span> k) <span class="kw">where</span>
+  zero <span class="fu">=</span> Map.empty</code></pre>
+<p>I call it <em>the reliable empty</em>.</p>
+<h2 id="conclusion">Conclusion</h2>
+<p>See what I did here? Noticed the pattern?</p>
+<p>As an important final note, while you might be mostly used to:</p>
+<ul>
+<li><a href="http://hackage.haskell.org/package/base-4.6.0.1/docs/Data-Monoid.html#t:mempty">mempty</a> means empty</li>
+<li><a href="http://hackage.haskell.org/package/base-4.6.0.1/docs/Data-Monoid.html#t:mappend">mappend</a> means appending</li>
+<li>Alternatives means choice</li>
+</ul>
+<p>Those are assumptions that do not hold for all types (as I ilustrate on the second page of the <a href="http://fundeps.com/tables/FromSemigroupToMonads.pdf">cheatsheet</a> ).</p>
+<p>In fact, once you start thinking about monoids/semigroups as simply <em>binary operations</em>, you start seeing them everywhere, and you start appreciating the usefulness of sometimes dropping the identity/empty/return, etc.</p>
+<p>In my next post I will ilustrate this, and show how to automatically derive Monoid instances, dramatically reducing your boilerplate.</p>
+<p>As usual, please report any typo, error, or gross misundertanding on my part to the email below. Thanks!</p>]]></summary>
+</entry>
+<entry>
+    <title>Haskell Cheat Sheets (Part 1)</title>
+    <link href="http://fundeps.com/posts/cheatsheets/2014-03-04-cheat-sheets/index.html" />
+    <id>http://fundeps.com/posts/cheatsheets/2014-03-04-cheat-sheets/index.html</id>
+    <published>2014-03-04T00:00:00Z</published>
+    <updated>2014-03-04T00:00:00Z</updated>
+    <summary type="html"><![CDATA[<p><em>tl;dr:</em> : see <a href="/tables/FromSemigroupToMonads.pdf">this</a>.</p>
+<p>If you look for Haskell cheat sheets on the web, you get:</p>
+<ul>
+<li><a href="http://cheatsheet.codeslower.com/CheatSheet.pdf">Code Slower 14 pages cheat sheet</a></li>
+<li><a href="http://www.haskell.org/haskellwiki/Reference_card">Haskell Wiki Reference Card</a></li>
+<li><a href="http://www.cheat-sheets.org/saved-copy/Haskell.Haskell_Cheat_Sheet.pdf">A short one with the basics</a></li>
+<li><a href="https://wincent.com/wiki/Haskell_cheat_sheet">And another one</a></li>
+<li><a href="https://github.com/rudymatela/ultimate-cheat-sheets">Ultimate Haskell Cheat Sheet</a></li>
+</ul>
+<p>Personally, I find none of them particular useful. While the last three are useful for the absolute beginner, it seems that there’s a gap from there forward.</p>
+<p>Of course, the usual answer is <a href="https://stackoverflow.com/questions/1162360/haskell-function-cheat-sheet">why do you need a cheat sheet, if there is hoogle</a>, but while <a href="http://www.haskell.org/hoogle/">hoogle</a> and <a href="http://holumbus.fh-wedel.de/hayoo/hayoo.html">hayoo</a> are great, they only help you when you know what you are looking for exactly, namely the type signature.</p>
+<p>Sometimes, it is useful to just have a lot information condensed in such a way that’s easy to analyse, so that you can make informed decisions or just easily discover additional functions.</p>
+<p>With that purpose in mind, I plan to launch some Haskell cheat sheets, with different levels of complexity and applicability, but with some clear goals in mind:</p>
+<ul>
+<li>Succinct</li>
+<li>Ready to print, for the paper lovers like me</li>
+<li>Frequently updated and thus, one expects, always correct</li>
+</ul>
+<p>The first Haskell sheet cheat I’ll be releasing is one were I illustrate:</p>
+<ul>
+<li><a href="http://hackage.haskell.org/package/semigroups">Semigroup</a> , <a href="http://hackage.haskell.org/package/base-4.6.0.1/docs/Data-Monoid.html">Monoid</a> , <a href="http://hackage.haskell.org/package/semigroupoids-4.0/docs/Data-Functor-Alt.html">Alt</a> , <a href="http://hackage.haskell.org/package/semigroupoids-4.0/docs/Data-Functor-Plus.html">Plus</a> , <a href="http://hackage.haskell.org/package/semigroupoids-4.0/docs/Data-Functor-Apply.html">Apply</a> , <a href="http://hackage.haskell.org/package/base-4.6.0.1/docs/Control-Applicative.html#t:Applicative">Applicative</a> , <a href="http://hackage.haskell.org/package/base-4.6.0.1/docs/Control-Applicative.html#t:Alternative">Alternative</a> , <a href="http://hackage.haskell.org/package/semigroupoids-4.0/docs/Data-Functor-Bind.html">Bind</a> , <a href="http://hackage.haskell.org/package/base-4.6.0.1/docs/Control-Monad.html#t:Monad">Monad</a> , <a href="http://hackage.haskell.org/package/base-4.6.0.1/docs/Control-Monad.html#t:MonadPlus">MonadPlus</a> hierarchy</li>
+<li>Fundamental operations supported by each type class</li>
+<li>Semantics of the binary operation (Choice, Combination, Both, Neither)</li>
+<li>Type Class restrictions</li>
+</ul>
+<div class="figure">
+<img src="/images/fromsemigroup.png" />
+</div>
+<p><strong>You can get it <a href="/tables/FromSemigroupToMonads.pdf">here</a>.</strong></p>
+<p><strong>If you don’t know half of those type classes, please see my <a href="http://fundeps.com/posts/haskell/2014-03-05-from-semigroup-to-bind">next post</a>, for a quick and dirty introduction.</strong></p>
+<p>These tables were made incrementally as I was learning each type class. They are still incomplete (namely the second page is still a partial copy-paste of the first), and they are - get ready to puke - in <a href="https://github.com/jcristovao/haskell-cheatsheets">LibreOffice format</a>, not Latex. But for these really complex tables I find it more useful: but I’m open to suggestions.</p>
+<p>There are probably some lingering errors, and the table were not, unfortunately, made through automated code analysis. I would very much like that, but right now I see it as a very time consuming task…</p>
+<p>Please feel free to identify mistakes, make suggestions or otherwise give your feedback on these. The original file is <a href="https://github.com/jcristovao/haskell-cheatsheets">at GitHub</a>.</p>
+<p>Thanks!</p>]]></summary>
+</entry>
+
 </feed>
