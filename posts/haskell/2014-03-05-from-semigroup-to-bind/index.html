@@ -166,7 +166,7 @@
 <p><strong>Functor</strong>:</p>
 <pre class="sourceCode Haskell"><code class="sourceCode haskell"><span class="kw">class</span> <span class="dt">Functor</span> f <span class="kw">where</span>
 <span class="ot">    fmap ::</span> (a <span class="ot">-&gt;</span> b) <span class="ot">-&gt;</span> f a <span class="ot">-&gt;</span> f b</code></pre>
-<p>__ Applicative __:</p>
+<p><strong>Applicative:</strong></p>
 <pre class="sourceCode Haskell"><code class="sourceCode haskell"><span class="kw">class</span> <span class="dt">Functor</span> f <span class="ot">=&gt;</span> <span class="dt">Applicative</span> f <span class="kw">where</span>
     <span class="co">-- | Lift a value.</span>
 <span class="ot">    pure ::</span> a <span class="ot">-&gt;</span> f ak
@@ -217,8 +217,8 @@
   join <span class="fu">=</span> (<span class="fu">&gt;&gt;-</span> id)</code></pre>
 <p><em>But, what does it do, that a monad doesn’t?</em></p>
 <p>It allows you to include some extra types, like <a href="http://hackage.haskell.org/package/containers-0.5.4.0/docs/Data-IntMap-Lazy.html">IntMap</a></p>
-<h4 id="fifth-question-__can-i-add-a-zero-value-to-alt-to-get-sometimes-different-semantincs-from-alternative-empty">Fifth question: __Can I add a <code>zero</code> value to Alt, to get (sometimes) different semantincs from Alternative <code>empty</code>?</h4>
-<p>Well, this one does seem a little bit far fetched, doesn’t it? But you do gain some extra instances (for example):</p>
+<h4 id="fifth-question-can-i-add-a-zero-value-to-alt">Fifth question: <strong>Can I add a <code>zero</code> value to Alt</strong>?</h4>
+<p>Well, this one does seem a little bit far fetched, doesn’t it, since one of the steps of defining Alt was precisely to drop the empty… but, not just that (also just depending on Functor, and not Applicative instances). Hence, <code>zero</code> arrives. Once again, you do gain some extra instances (for example):</p>
 <pre class="sourceCode Haskell"><code class="sourceCode haskell"><span class="kw">instance</span> <span class="dt">Plus</span> <span class="dt">IO</span> <span class="kw">where</span>
   zero <span class="fu">=</span> error <span class="st">&quot;zero&quot;</span>
 
