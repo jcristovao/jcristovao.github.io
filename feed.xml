@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+    <title>Fun Deps</title>
+    <link href="http://fundeps.com/feed.xml" rel="self" />
+    <link href="http://fundeps.com" />
+    <id>http://fundeps.com/feed.xml</id>
+    <author>
+        <name>Joao Cristovao</name>
+        <email>jmacristovao@gmail.com</email>
+    </author>
+    <updated>Unknown</updated>
+    
+</feed>
