@@ -59,7 +59,7 @@
 <span class="ot">  (&lt;&gt;) ::</span> a <span class="ot">-&gt;</span> a <span class="ot">-&gt;</span> a</code></pre>
 <p><em>But, what does it do, that a monoid doesn’t?</em></p>
 <p>It gives you <a href="http://hackage.haskell.org/package/semigroups-0.12.2/docs/Data-Semigroup.html#t:Min">Min</a> and <a href="http://hackage.haskell.org/package/semigroups-0.12.2/docs/Data-Semigroup.html#t:Max">Max</a>. This would not be possible with a monoid. What’s the identity of a Maximum? Do you want to define that?</p>
-<p>Plus, you get <a href="http://hackage.haskell.org/package/semigroups-0.12.2/docs/Data-List-NonEmpty.html">more instances</a> than you get with monoids.</p>
+<p>Plus, you get more instances than you get with monoids, namely <a href="http://hackage.haskell.org/package/semigroups-0.12.2/docs/Data-List-NonEmpty.html">Data.List.NonEmpty</a>. This is a list that is type checked to always have at least one element, and thus functions like head always succeed. On the other hand, since there is no ‘empty’ element, this type can only be an instance of Semigroup.</p>
 <h4 id="second-question-what-can-i-get-if-i-remove-the-empty-from-an-alternative">Second question: <strong>what can I get if I remove the empty (from an Alternative)</strong>?</h4>
 <h5 id="bonus-question-can-i-get-something-that-behaves-like-an-alternative-just-with-a-functor-constraint">Bonus question: <strong>can I get something that behaves like an alternative, just with a Functor constraint?</strong></h5>
 <p><em>Yes: It’s called an <a href="http://hackage.haskell.org/package/semigroupoids-4.0/docs/Data-Functor-Alt.html">Alt</a></em>:</p>
