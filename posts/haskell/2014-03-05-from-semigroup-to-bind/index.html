@@ -166,7 +166,7 @@
 <p><strong>Functor</strong>:</p>
 <pre class="sourceCode Haskell"><code class="sourceCode haskell"><span class="kw">class</span> <span class="dt">Functor</span> f <span class="kw">where</span>
 <span class="ot">    fmap ::</span> (a <span class="ot">-&gt;</span> b) <span class="ot">-&gt;</span> f a <span class="ot">-&gt;</span> f b</code></pre>
-<p>__ Applicative__:</p>
+<p>__ Applicative __:</p>
 <pre class="sourceCode Haskell"><code class="sourceCode haskell"><span class="kw">class</span> <span class="dt">Functor</span> f <span class="ot">=&gt;</span> <span class="dt">Applicative</span> f <span class="kw">where</span>
     <span class="co">-- | Lift a value.</span>
 <span class="ot">    pure ::</span> a <span class="ot">-&gt;</span> f ak
