@@ -144,7 +144,7 @@
 		  
 
           <p><em>tl;dr:</em> : what are Alt, Apply, Bind typeclasses</p>
-<p>So, the one common comment I received on my first <a href="fundeps.com/posts/cheatsheets/2014-03-04-cheat-sheets/">haskell cheatsheet</a> was: it looks great, but I have no idea what half of those typeclasses are.</p>
+<p>So, the one common comment I received on my first <a href="http://fundeps.com/posts/cheatsheets/2014-03-04-cheat-sheets/">haskell cheatsheet</a> was: it looks great, but I have no idea what half of those typeclasses are.</p>
 <p>So, I guess an explanation is due.</p>
 <p>My first glimpse of understanding came from this <a href="http://hackage.haskell.org/package/semigroupoids">beautiful ASCII art</a>, which I’ll reproduce here (with Edward Kmett’s permission):</p>
 <pre><code> Traversable &lt;---- Foldable &lt;--- Functor ------&gt; Alt ---------&gt; Plus           Semigroupoid
@@ -233,7 +233,7 @@
 <li><a href="http://hackage.haskell.org/package/base-4.6.0.1/docs/Data-Monoid.html#t:mappend">mappend</a> means appending</li>
 <li>Alternatives means choice</li>
 </ul>
-<p>Those are assumptions that do not hold for all types.</p>
+<p>Those are assumptions that do not hold for all types (as I ilustrate on the second page of the <a href="http://fundeps.com/tables/FromSemigroupToMonads.pdf">cheatsheet</a> ).</p>
 <p>In fact, once you start thinking about monoids/semigroups as simply <em>binary operations</em>, you start seeing them everywhere, and you start appreciating the usefulness of sometimes dropping the identity/empty/return, etc.</p>
 <p>In my next post I will ilustrate this, and show how to automatically derive Monoid instances, dramatically reducing your boilerplate.</p>
 <p>As usual, please report any typo, error, or gross misundertanding on my part to the email below. Thanks!</p>
