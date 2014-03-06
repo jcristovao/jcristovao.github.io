@@ -224,7 +224,7 @@
 <pre class="sourceCode Haskell"><code class="sourceCode haskell"><span class="co">-- &gt; associative composition: (.) &lt;$&gt; u &lt;.&gt; v &lt;.&gt; w = u &lt;.&gt; (v &lt;.&gt; w)</span>
 <span class="kw">class</span> <span class="dt">Functor</span> f <span class="ot">=&gt;</span> <span class="dt">Apply</span> f <span class="kw">where</span>
 <span class="ot">  (&lt;.&gt;) ::</span> f (a <span class="ot">-&gt;</span> b) <span class="ot">-&gt;</span> f a <span class="ot">-&gt;</span> f b</code></pre>
-<p><em>But, what does it do, that a alternative doesn’t?</em></p>
+<p><em>But, what does it do, that a applicative doesn’t?</em></p>
 <p>It allows you to include some extra types, like <a href="http://hackage.haskell.org/package/containers-0.5.4.0/docs/Data-IntMap-Lazy.html">IntMap</a></p>
 <h4 id="fourth-question-what-can-i-get-if-i-remove-the-return-from-a-monad">Fourth question: <strong>what can I get if I remove the return from a Monad</strong>?</h4>
 <p>A <a href="http://hackage.haskell.org/package/semigroupoids-4.0/docs/Data-Functor-Bind.html#t:Bind">Bind</a></p>
