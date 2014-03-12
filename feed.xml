@@ -119,7 +119,7 @@ hasHaskellExperience <span class="fu">=</span> unpack <span class="fu">.</span> 
 <pre class="sourceCode Haskell"><code class="sourceCode haskell">print <span class="fu">$</span> foldMap (\e <span class="ot">-&gt;</span> (<span class="dt">First</span> (age e), <span class="dt">Sum</span> (numProjects e), <span class="dt">All</span> (haskell e))) [empl0,empl1,empl2]</code></pre>
 <p>That would return a tuple with the same information, without having to even declare <code>EmployeeProfile</code> as a Monoid, hence forcing a given monoid structure on those fields.</p>
 <p>Thus, it is, as usual, a matter of what you intend to do with your data. If you have a long record, with the possibility of adding additional fields later, but you intend to combine them always in the same manner, the solution presented in this post has some clear advantages, since you don’t have to modify the monoid instance manually for each field.</p>
-<p>But if you can see yourself needing to extract different information using different monoids, then perhaps you need the simpler data record, and instead you’ll use the <code>Monoid</code> <code>newtypes</code> on your code, rather than your data structure.</p>
+<p>But if you can see yourself needing to extract different information using different monoids, then perhaps you need the simpler data record, and instead you’ll use the <code>Monoid</code> <code>newtypes</code> on your functions, rather than your data structure.</p>
 <p>It’s up to you, really :)</p>]]></summary>
 </entry>
 <entry>
