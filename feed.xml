@@ -8,8 +8,105 @@
         <name>Joao Cristovao</name>
         <email>jmacristovao@gmail.com</email>
     </author>
-    <updated>2014-03-05T00:00:00Z</updated>
+    <updated>2014-03-12T00:00:00Z</updated>
     <entry>
+    <title>Monoids, Newtypes and the Evil Human Resources Dept.</title>
+    <link href="http://fundeps.com/posts/haskell/2014-03-12-Monoids-Newtypes-and-HR/index.html" />
+    <id>http://fundeps.com/posts/haskell/2014-03-12-Monoids-Newtypes-and-HR/index.html</id>
+    <published>2014-03-12T00:00:00Z</published>
+    <updated>2014-03-12T00:00:00Z</updated>
+    <summary type="html"><![CDATA[<p><em>tl;dr:</em> what are those newtypes on monoid good for</p>
+<h3 id="the-problem-with-sum">The problem with Sum</h3>
+<p>When I read the excelent <a href="http://learnyouahaskell.com/">LYAH</a>, namely the <a href="http://learnyouahaskell.com/functors-applicative-functors-and-monoids#monoids">monoid</a> section, I must confess at first I didn’t quite get the usefulness of newtypes like <a href="http://hackage.haskell.org/package/base-4.6.0.1/docs/Data-Monoid.html#t:Sum">Sum</a>, <a href="http://hackage.haskell.org/package/base-4.6.0.1/docs/Data-Monoid.html#t:Product">Product</a> or <a href="http://hackage.haskell.org/package/base-4.6.0.1/docs/Data-Monoid.html#t:Sum">First</a>.</p>
+<p>I mean, let’s take <code>Sum</code>. You have a list of <code>Int</code> that you want to sum. To use this, you must first convert it to the newtype <code>Sum</code></p>
+<pre class="sourceCode Haskell"><code class="sourceCode haskell"><span class="kw">import </span><span class="dt">Data.Monoid</span>
+
+<span class="kw">let</span> x <span class="fu">=</span> [<span class="dv">1</span>,<span class="dv">2</span>,<span class="dv">3</span>,<span class="dv">4</span>,<span class="dv">5</span>]<span class="ot"> ::</span> [<span class="dt">Int</span>]
+
+<span class="kw">let</span> y <span class="fu">=</span> map <span class="dt">Sum</span> x</code></pre>
+<p>And then apply <code>getSum</code> to extract the result:</p>
+<pre class="sourceCode Haskell"><code class="sourceCode haskell"><span class="kw">let</span> result <span class="fu">=</span> getSum <span class="fu">.</span> mconcat <span class="fu">$</span> y
+
+print result
+
+<span class="fu">&gt;</span> <span class="dv">15</span></code></pre>
+<p>It honestly seems dumb for something that can more easily be achieved with:</p>
+<pre class="sourceCode Haskell"><code class="sourceCode haskell"><span class="kw">let</span> result <span class="fu">=</span> foldr1 (<span class="fu">+</span>) x</code></pre>
+<p>Or, even simpler:</p>
+<pre class="sourceCode Haskell"><code class="sourceCode haskell"><span class="kw">let</span> result <span class="fu">=</span> sum x</code></pre>
+<p>So, what’s the point about those Newtypes anyway? Aren’t they more trouble than what their worth?</p>
+<h3 id="monoid-records">Monoid records</h3>
+<p>My <a href="https://en.wikipedia.org/wiki/Eureka_effect">eureka moment</a> happened in two parts:</p>
+<ul>
+<li><p>First, I was looking at the <a href="http://hackage.haskell.org/package/semigroups">semigroups</a>, a <a href="http://fundeps.com/posts/haskell/2014-03-05-from-semigroup-to-bind/">simpler</a> version of monoids, and their definition as <em>anything that associates</em> really clicked.</p></li>
+<li><p>And then, I discovered <a href="http://hackage.haskell.org/package/generic-deriving-1.6.2/docs/Generics-Deriving-Monoid.html">Generics.Deriving.Monoid</a></p></li>
+</ul>
+<p>So, if you have a long list of records that you want to combine, you can ‘encode’ how they should be combined in each of the fields using a <code>Monoid</code> newtype. And then, you can automatically derive a monoid instance for the record using generics.</p>
+<p>Let’s see an example:</p>
+<h3 id="evil-director-of-human-resources">Evil Director of Human Resources</h3>
+<p><em>warning: dark humor ahead</em></p>
+<p>Let’s say you are an <a href="https://en.wikipedia.org/wiki/Catbert">evil director of HR</a> tasked with choosing a person to assign to a project your company is bidding on. The project has some requirements:</p>
+<ul>
+<li>The resource must be senior</li>
+<li>The resource must have worked in at least five projects before</li>
+<li>The resource must have worked with Haskell</li>
+</ul>
+<p>However, you are not sure if any of your employees fits the profile, as you only hire cheap labor. What should you do?</p>
+<p>Easy! You combine each of the employees experience into a single super-profile!</p>
+<p>Let start by defining each employee profile:</p>
+<pre class="sourceCode Haskell"><code class="sourceCode haskell"><span class="ot">{-# LANGUAGE DeriveGeneric #-}</span>
+<span class="kw">import </span><span class="dt">GHC.Generics</span>
+<span class="kw">import </span><span class="dt">Generics.Deriving.Monoid</span>
+
+<span class="kw">data</span> <span class="dt">EmployeeProfile</span> <span class="fu">=</span> <span class="dt">EmployeeProfile</span>
+  {<span class="ot"> age         ::</span> <span class="dt">First</span> <span class="dt">Int</span> <span class="co">-- for legal reasons, you don&#39;t store the age of some employees</span>
+  ,<span class="ot"> numProjects ::</span> <span class="dt">Sum</span> <span class="dt">Int</span>   <span class="co">-- you want to gather as much experience as possible</span>
+  ,<span class="ot"> haskell     ::</span> <span class="dt">Any</span>       <span class="co">-- implict boolean</span>
+  ,<span class="ot"> python      ::</span> <span class="dt">Any</span>       <span class="co">-- implicit boolean</span>
+  } <span class="kw">deriving</span> (<span class="dt">Eq</span>,<span class="dt">Ord</span>,<span class="dt">Show</span>,<span class="dt">Generic</span>)</code></pre>
+<p>Now, lets insert our three employees:</p>
+<pre class="sourceCode Haskell"><code class="sourceCode haskell">empl0 <span class="fu">=</span> <span class="dt">EmployeeProfile</span> (<span class="dt">First</span> <span class="dt">Nothing</span>)  (<span class="dt">Sum</span> <span class="dv">1</span>) (<span class="dt">Any</span> <span class="dt">False</span>) (<span class="dt">Any</span> <span class="dt">True</span>)
+empl1 <span class="fu">=</span> <span class="dt">EmployeeProfile</span> (<span class="dt">First</span> <span class="dt">Nothing</span>)  (<span class="dt">Sum</span> <span class="dv">2</span>) (<span class="dt">Any</span> <span class="dt">True</span> ) (<span class="dt">Any</span> <span class="dt">True</span>)
+empl2 <span class="fu">=</span> <span class="dt">EmployeeProfile</span> (<span class="dt">First</span> (<span class="dt">Just</span> <span class="dv">25</span>))(<span class="dt">Sum</span> <span class="dv">0</span>) (<span class="dt">Any</span> <span class="dt">False</span>) (<span class="dt">Any</span> <span class="dt">False</span>)</code></pre>
+<p>So, not a great pool of workers. Let’s combine them into a super worker!</p>
+<pre class="sourceCode Haskell"><code class="sourceCode haskell"><span class="co">-- Generics.Deriving.Monoid magic</span>
+<span class="kw">instance</span> <span class="dt">Monoid</span> <span class="dt">EmployeeProfile</span> <span class="kw">where</span>
+   mempty  <span class="fu">=</span> memptydefault
+   mappend <span class="fu">=</span> mappenddefault
+
+<span class="kw">let</span> greatEmployee <span class="fu">=</span> mconcat [empl0,empl1,empl2]
+
+print greatEmployee 
+
+<span class="fu">&gt;</span> <span class="dt">EmployeeProfile</span> { age <span class="fu">=</span> <span class="dt">First</span> {getFirst <span class="fu">=</span> <span class="dt">Just</span> <span class="dv">25</span>}
+				  , numProjects <span class="fu">=</span> <span class="dt">Sum</span> {getSum <span class="fu">=</span> <span class="dv">3</span>}
+				  , haskell <span class="fu">=</span> <span class="dt">Any</span> {getAny <span class="fu">=</span> <span class="dt">True</span>}
+				  , python <span class="fu">=</span> <span class="dt">Any</span> {getAny <span class="fu">=</span> <span class="dt">True</span>}}</code></pre>
+<p>That’s better! Now you’ve got an employee with 25 years of age, that has worked in three projects and has Haskell experience!</p>
+<p>Now imagine what you can do with an enormous pool of mostly unskilled labour! You can almost simulate a very competent Haskell programmer!</p>
+<p>This was still a small example, with some added boilerplate. The main catch here is that this boilerplate is always the same independently of the record size, as long as all its fields are monoids themselves.</p>
+<p>Some of the fields could benefit from being a semigroup instead of monoid. For example, <code>age</code> should instead be a <a href="http://hackage.haskell.org/package/semigroups-0.12.2/docs/Data-Semigroup.html#t:Max">Max</a>, so that we would select the eldest of ages, and thus be more compliant with the senior requirement. This is still not possible, since Semigroups do not support generic instances, but let’s see if there is <a href="https://github.com/ekmett/semigroups/issues/26">openess to include it</a>.</p>
+<p>To extract values from this structure, you also have some additional boilerplate, namely the newtype ‘getter’:</p>
+<pre class="sourceCode Haskell"><code class="sourceCode haskell"><span class="ot">getAge ::</span> <span class="dt">EmployeeProfile</span> <span class="ot">-&gt;</span> <span class="dt">Int</span>
+getAge <span class="fu">=</span> getFirst <span class="fu">.</span> age
+
+<span class="ot">hasHaskellExperience ::</span> <span class="dt">EmployeeProfile</span> <span class="ot">-&gt;</span> <span class="dt">Bool</span>
+hasHaskellExperience <span class="fu">=</span> getAny <span class="fu">.</span> haskell</code></pre>
+<p>If you are bothered by having to memorize all those ‘getters’ and ‘setters’ (and are not using something more advanced like <a href="http://hackage.haskell.org/package/lens">lenses</a>), you can benefit from Darius Jahandarie package Newtype, that I have modified to include generics support (shameless auto-promotion): <a href="http://hackage.haskell.org/package/newtype-generics">newtype-generics</a></p>
+<p>Then, you just have to modify the code to:</p>
+<pre class="sourceCode Haskell"><code class="sourceCode haskell"><span class="kw">import </span><span class="dt">Control.Newtype</span>
+
+(<span class="fu">...</span>)
+
+<span class="ot">getAge ::</span> <span class="dt">EmployeeProfile</span> <span class="ot">-&gt;</span> <span class="dt">Int</span>
+getAge <span class="fu">=</span> unpack <span class="fu">.</span> age
+
+<span class="ot">hasHaskellExperience ::</span> <span class="dt">EmployeeProfile</span> <span class="ot">-&gt;</span> <span class="dt">Bool</span>
+hasHaskellExperience <span class="fu">=</span> unpack <span class="fu">.</span> haskell</code></pre>
+<p>Of course, It would be even nicer to automatically extract all the newtypes into a new structure, but as that would give rise to an (undefined / anonymous) new type, something that <a href="https://stackoverflow.com/questions/22299840/derive-a-record-datatype-without-template-haskell">it is not possible without template haskell</a>.</p>
+<p>I hope you’ve liked this article. I have not bothered with the details of how generics work, but instead tried to give a more hands on approach of why I found monoid structures useful. Also, please note that I do not condone <em>evil human resources departments</em> :)</p>]]></summary>
+</entry>
+<entry>
     <title>From semigroups to bind</title>
     <link href="http://fundeps.com/posts/haskell/2014-03-05-from-semigroup-to-bind/index.html" />
     <id>http://fundeps.com/posts/haskell/2014-03-05-from-semigroup-to-bind/index.html</id>
@@ -107,7 +204,7 @@
 </ul>
 <p>Those are assumptions that do not hold for all types (as I ilustrate on the second page of the <a href="http://fundeps.com/tables/FromSemigroupToMonads.pdf">cheatsheet</a> ).</p>
 <p>In fact, once you start thinking about monoids/semigroups as simply <em>binary operations</em>, you start seeing them everywhere, and you start appreciating the usefulness of sometimes dropping the identity/empty/return, etc.</p>
-<p>In my next post I will ilustrate this, and show how to automatically derive Monoid instances, dramatically reducing your boilerplate.</p>
+<p><a href="/posts/haskell/2014-03-12-Monoids-Newtypes-and-HR/">In my next post</a> I will ilustrate this, and show how to automatically derive Monoid instances, dramatically reducing your boilerplate.</p>
 <p>As usual, please report any typo, error, or gross misundertanding on my part to the email below. Thanks!</p>]]></summary>
 </entry>
 <entry>
