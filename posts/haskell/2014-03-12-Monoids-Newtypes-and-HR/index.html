@@ -255,6 +255,22 @@ getAge <span class="fu">=</span> unpack <span class="fu">.</span> age
 hasHaskellExperience <span class="fu">=</span> unpack <span class="fu">.</span> haskell</code></pre>
 <p>Of course, It would be even nicer to automatically extract all the newtypes into a new structure, but as that would give rise to an (undefined / anonymous) new type, something that <a href="https://stackoverflow.com/questions/22299840/derive-a-record-datatype-without-template-haskell">it is not possible without template haskell</a>.</p>
 <p>I hope you’ve liked this article. I have not bothered with the details of how generics work, but instead tried to give a more hands on approach of why I found monoid structures useful. Also, please note that I do not condone <em>evil human resources departments</em> :)</p>
+<h3 id="addendum">Addendum</h3>
+<p>As <a href="http://www.reddit.com/r/haskell/comments/207yjp/monoids_newtypes_and_the_evil_human_resources_dept/cg0p7gt">Edward Kmett points out</a> this practice is not without its problems. You are indeed forcing a monoid structure in your record that may not fullfil all needs.</p>
+<p>As he points out, lets suppose you indeed need to find a employee that fullfils all requisites, instead of ‘inventing’ one. Then, you need an intersection.</p>
+<p>You would then define a simpler structure:</p>
+<pre class="sourceCode Haskell"><code class="sourceCode haskell"><span class="kw">data</span> <span class="dt">EmployeeProfile</span> <span class="fu">=</span> <span class="dt">EmployeeProfile</span>
+  {<span class="ot"> age         ::</span> <span class="dt">Maybe</span> <span class="dt">Int</span> <span class="co">-- for legal reasons, you don't store the age of some employees</span>
+  ,<span class="ot"> numProjects ::</span> <span class="dt">Int</span>   <span class="co">-- you want to gather as much experience as possible</span>
+  ,<span class="ot"> haskell     ::</span> <span class="dt">Bool</span>  
+  ,<span class="ot"> python      ::</span> <span class="dt">Bool</span> 
+  } <span class="kw">deriving</span> (<span class="dt">Eq</span>,<span class="dt">Ord</span>,<span class="dt">Show</span>,<span class="dt">Generic</span>)</code></pre>
+<p>and then you could just have this:</p>
+<pre class="sourceCode Haskell"><code class="sourceCode haskell">print <span class="fu">$</span> foldMap (\e <span class="ot">-&gt;</span> (<span class="dt">First</span> (age e), <span class="dt">Sum</span> (numProjects e), <span class="dt">All</span> (haskell e))) [empl0,empl1,empl2]</code></pre>
+<p>That would return a tuple with the same information, without having to even declare <code>EmployeeProfile</code> as a Monoid, hence forcing a given monoid structure on those fields.</p>
+<p>Thus, it is, as usual, a matter of what you intend to do with your data. If you have a long record, with the possibility of adding additional fields later, but you intend to combine them always in the same manner, the solution presented in this post has some clear advantages, since you don’t have to modify the monoid instance manually for each field.</p>
+<p>But if you can see yourself needing to extract different information using different monoids, then perhaps you need the simpler data record, and instead you’ll use the <code>Monoid</code> <code>newtypes</code> on your code, rather than your data structure.</p>
+<p>It’s up to you, really :)</p>
 
 <script id="fbxg9z0">(function(i){var f,s=document.getElementById(i);f=document.createElement('iframe');f.src='//api.flattr.com/button/view/?uid=jcristovao&button=compact&url='+encodeURIComponent(document.URL);f.title='Flattr';f.height=20;f.width=110;f.style.borderWidth=0;s.parentNode.insertBefore(f,s);})('fbxg9z0');</script>
   <div id="disqus_thread"></div>
