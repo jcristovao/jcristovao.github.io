@@ -397,7 +397,7 @@ main <span class="fu">=</span> <span class="kw">do</span>
 
     <span class="co">-- | Map covariantly over the second argument.</span>
 <span class="ot">    second ::</span> (b <span class="ot">-&gt;</span> c) <span class="ot">-&gt;</span> p a b <span class="ot">-&gt;</span> p a c</code></pre>
-<p>While this is, IMHO, not a bad outcome at all, I still feel that more straight-forward functions would do more good than harm, namely easing the way for Haskell newbies.</p>
+<p>While this is, IMHO, not a bad outcome at all, I still feel that more straight-forward functions on <code>Data.Either</code> and <code>Data.Tuple</code> would do more good than harm, namely easing the way for Haskell newbies.</p>
 <p>But the <code>Bifunctor</code> is a very usefull (and logical) abstraction, and it is definitelly most welcomed.</p>
 <h2 id="cheatsheet">Cheatsheet</h2>
 <p>So, arrows operators can be quite useful for types that are parameterized over two types: <a href="http://hackage.haskell.org/package/base-4.7.0.0/docs/Data-Either.html">Either</a> for choice, <a href="http://hackage.haskell.org/package/base-4.7.0.0/docs/Data-Tuple.html">Tuple</a> for combinations.</p>
