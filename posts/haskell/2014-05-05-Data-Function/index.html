@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <meta charset="utf-8">
+ 	
+				<meta name="keywords" content="Arrow,Either,alt,apply,bind,cheatcheets,cheatsheet,functions,haskell,monoid,newtype,semigroup,typeclass">
+
+	
+	<meta name="description" content="A Functional Dependency: an Haskell Blog for the novice to intermediate user" />
+	<meta name="author" content="Joao Cristovao" />
+    <title>Fun Deps: All about functions</title>
+	<link rel="shortcut icon" type="image/x-icon" href="../../../favicon.ico" />
+    <link href="http://fonts.googleapis.com/css?family=Ubuntu" rel="stylesheet" type="text/css">
+    <link href="http://fonts.googleapis.com/css?family=Oxygen" rel="stylesheet" type="text/css">
+    <!-- Bootstrap -->
+    <link href="../../../css/bootstrap.min.css" rel="stylesheet">
+    <link href="../../../css/syntax.css" rel="stylesheet">
+    <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
+    <script src="https://code.jquery.com/jquery.js"></script>
+    <!-- Include all compiled plugins (below), or include individual files as needed -->
+    <script src="../../../js/bootstrap.min.js"></script>
+    <!-- Update email -->
+	<script src="../../../js/eml.js"></script>
+
+	<script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?'http':'https';if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src=p+'://platform.twitter.com/widgets.js';fjs.parentNode.insertBefore(js,fjs);}}(document, 'script', 'twitter-wjs');</script>
+	<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'UA-48704700-1', 'fundeps.com');
+  ga('send', 'pageview');
+
+</script>
+    <style>
+      html,body, #body {
+        height:100%;
+      }
+      .container {
+        width: 100%;
+        -moz-box-sizing: border-box;
+        box-sizing: border-box;
+        overflow:hidden;
+        min-height: 100%;
+        padding: 0 15px;
+      }
+      .content, .sidebar {
+        padding-bottom:99999px;
+        margin-bottom:-99999px;
+      }
+      .content { background-color: white; }
+      .sidebar { background-color: cyan; }
+      .brd 
+        {
+          border-right-style:solid;
+          border-right: solid thin #CCCCCC;
+          background-color: #F0F0F0;
+        } 
+
+      article {
+        margin-bottom: 2em;
+      }
+      
+    </style>
+  </head>
+
+  <body onload="javascript: document.getElementsByClassName('mll').href='mailto:jcristovao@gmail.com';">
+  <div class="container">
+    <div id="body" class="row">
+      <div class="col-lg-2 col-md-2 col-sm-2 col-xs-3 sidebar text-right brd">
+        <div class="row"> </div>
+        <div class="row center-block">
+          <a href="../../../"><img src="../../../images/fundeps2.png" alt="fundeps"></a>
+        </div>
+        <div class="row"> </div>
+        <div class="row-center-block">
+          <h3>
+			  <strong><a href="../../../about.html">About</a></strong>
+		  </h3>
+        </div>
+          <div class="row center-block">
+            <h5>
+				<strong>
+					<a href="../../../feed.xml">Feed  <img src="../../../images/feed.png" alt="subscribe via rss" /></a>
+				</strong> 
+				<!--<span class="small glyphicon glyphicon-star" />-->
+			</h5>
+          </div>
+
+          <div class="row center-block">
+            <h5>
+				<strong>
+					<a href="https://github.com/jcristovao">GitHub</a>
+				</strong> 
+				<!--<span class="small glyphicon glyphicon-star" />-->
+			</h5>
+          </div>
+		  <!--<div class="row center-block">-->
+			<!--<a href="https://flattr.com/submit/auto?user_id=jcristovao&url=http%3A%2F%2Ffundeps.com" target="_blank"><img src="//api.flattr.com/button/flattr-badge-large.png" alt="Flattr this" title="Flattr this" border="0"></a>-->
+		  <!--</div>-->
+          <!--<div class="row center-block">-->
+            <!--<h5>-->
+				<!--<strong>-->
+					<!--<a href="http://pt.linkedin.com/in/joaocristovao/">LinkedIn</a>-->
+				<!--</strong> -->
+				<!--<span class="small glyphicon glyphicon-star" />-->
+			<!--</h5>-->
+          <!--</div>-->
+
+          <div class="row center-block">
+            <!--<h5>-->
+				<!--<strong>-->
+					<!--<a href="/">Links</a>-->
+				<!--</strong>-->
+				<!--<span class="small glyphicon glyphicon-share" />-->
+			<!--</h5>-->
+          </div>
+          <!--<div class="row-center-block">-->
+            <!--<h5><strong><a href="/">Donate</a></strong> <span class="small glyphicon glyphicon-thumbs-up"></span></h5>-->
+          <!--</div>-->
+	    <div class="row-center-block">
+          <h3>
+			  <strong><a href="../../../categories.html">Categories</a></strong>
+		  </h3>
+        </div>
+		<div class="row-center-block">
+			
+				<a href="../../../tags/cheatsheets.html">cheatsheets (1)</a><br /> <a href="../../../tags/haskell.html">haskell (4)</a>
+			
+	    <div class="row-center-block">
+          <h3>
+			  <strong><a href="../../../tags.html">Tags</a></strong>
+		  </h3>
+        </div>
+			
+				<a href="../../../tags/haskell.html">haskell (5)</a><br /> <a href="../../../tags/monoid.html">monoid (2)</a><br /> <a href="../../../tags/typeclass.html">typeclass (2)</a><br /> <a href="../../../tags/Arrow.html">Arrow (1)</a><br /> <a href="../../../tags/Either.html">Either (1)</a><br /> <a href="../../../tags/alt.html">alt (1)</a><br /> <a href="../../../tags/apply.html">apply (1)</a><br /> <a href="../../../tags/bind.html">bind (1)</a><br /> <a href="../../../tags/cheatcheets.html">cheatcheets (1)</a><br /> <a href="../../../tags/cheatsheet.html">cheatsheet (1)</a>
+			
+		</div>
+        <div class="row-center-block">
+			<h3><strong><a href="../../../archive.html">Archives</a></strong></h3>
+        </div>
+		<div class="row center-block">
+		  
+		</div>
+
+      </div>
+      <div class="col-lg-8 col-md-8 col-sm-8 col-xs-9 content">
+        <article>
+          <h2>All about functions
+            <small class="pull-right">
+              
+                2014-05-05
+              
+
+            </small></h2>
+		<h4>	
+			<small class="pull-right">
+			    <p>
+				 
+				<a href="https://twitter.com/share" class="twitter-share-button" data-via="fun_deps">Tweet</a>
+				</p>
+			</small>
+
+			<small class="pull-right">
+				
+					<a href="../../../tags/haskell.html">haskell</a>, <a href="../../../tags/functions.html">functions</a>, <a href="../../../tags/cheatcheets.html">cheatcheets</a>
+				
+			</small>
+		</h4>
+		  
+
+          <h2 id="data.function">Data.Function</h2>
+<p>A (hopefully) clear and extensive explanation of all there is to know (on an intermediate level) regarding functions in Haskell.</p>
+<p>This is a very practical guide. You will not see references to theory jargon unless strictly necessary (i.e., probably never).</p>
+<p>This post is my rendering/opinion of some of the documentation that should be on <a href="http://hackage.haskell.org/package/base-4.7.0.0/docs/Data-Function.html">Data.Function</a>, namely functions provided and documentation.</p>
+<p>The expected level of familiarity with Haskell for this ghide is that of <a href="http://learnyouahaskell.com/higher-order-functions">Learn You a Haskell for Great Good</a>.</p>
+<h2 id="functions-in-haskell">Functions in Haskell</h2>
+<p>If you are familiar with the very basics of functions in Haskell, feel free to <a href>skip this section</a>.</p>
+<h3 id="basics-part-i">Basics (Part I)</h3>
+<p>Function syntax, in Haskell, is <em>simpler</em> than in other languages. However, it may take you some time to familiarize yourself with it.</p>
+<p>Lets take a simple example, a custom function to add two numbers, and duplicate the result, called <code>addNDouble</code>. Lets first see how we would use such a function:</p>
+<p>In Python:</p>
+<pre class="sourceCode Python"><code class="sourceCode python">addNDouble (<span class="dv">4</span>,<span class="dv">5</span>)
+&gt; <span class="dv">18</span></code></pre>
+<p>In Haskell:</p>
+<pre class="sourceCode Haskell"><code class="sourceCode haskell">addNDouble <span class="dv">4</span> <span class="dv">5</span>
+<span class="fu">&gt;</span> <span class="dv">18</span></code></pre>
+<p>As you can see, it is not necessary to enclose the set of parameters over parenthesis, neither to separate them with commas: spaces will do just fine.</p>
+<p>Of course, this syntax choice means you might need to use parenthesis nevertheless to evaluate more complex expressions in a given parameter, where in Python this would not be needed.</p>
+<pre class="sourceCode Python"><code class="sourceCode python">addNDouble (a-b,<span class="dv">5</span>)</code></pre>
+<pre><code>addNDouble (a-b) 5</code></pre>
+<h3 id="basics-part-ii-partial-application">Basics (Part II) | Partial application</h3>
+<p>In Haskell functions can be partially applied, to get new functions:</p>
+<pre class="sourceCode Haskell"><code class="sourceCode haskell"><span class="kw">let</span> partial <span class="fu">=</span> addNDouble <span class="dv">5</span></code></pre>
+<p><code>partial</code> is a new function that has one parameter, adds 5 to it and then doubles the result. We’ll get back to this later.</p>
+<h3 id="basics-part-iii-defining-functions">Basics (Part III) | Defining functions</h3>
+<p>Defining the function above in Python would be something like:</p>
+<pre class="sourceCode Python"><code class="sourceCode python"><span class="kw">def</span> addNDouble (x,y):
+	<span class="kw">return</span> ((x+y)*<span class="dv">2</span>)</code></pre>
+<p>In Haskell, the simplistic way to do it would be:</p>
+<pre class="sourceCode Haskell"><code class="sourceCode haskell">addNDouble x y <span class="fu">=</span> (x <span class="fu">+</span> y) <span class="fu">*</span> <span class="dv">2</span></code></pre>
+<p>So, its actually simpler than the Python declaration.</p>
+<p>But, as you might alread know, Haskell is a strongly typed language, and thus the function above is not that well specified, since we don’t indicate what types it should operate on.</p>
+<p>In fact, for a Haskell compiler:</p>
+<p><strong>Int ≠ Integer ≠ Float ≠ Double</strong></p>
+<p>And no, you can not freely mix them. You’ll get a type error!</p>
+<p>While this is might seem a major bummer comming from dynamic languages, it is really one of the major advantages of Haskell. <em>You’ll always know what you get</em>. (But as this is not the main focus of this guide, I will not pursue this further).</p>
+<p>But one thing is clear. While the compiler can, much of the time, guess the types being used, you should, whenever obvious, specify them, <strong>specially if you are starting with Haskell</strong>.</p>
+<p>It will help you reason about your code, and it will help you avoid confusing error messages.</p>
+<p>So, let’s redefine our function to operate on <code>Int</code>.</p>
+<pre class="sourceCode Haskell"><code class="sourceCode haskell"><span class="ot">addNDouble ::</span> <span class="dt">Int</span> <span class="ot">-&gt;</span> <span class="dt">Int</span> <span class="ot">-&gt;</span> <span class="dt">Int</span>
+addNDouble x y <span class="fu">=</span> (x <span class="fu">+</span> y) <span class="fu">*</span> <span class="dv">2</span></code></pre>
+<p>Or, if you are trying this out in GHCi (notice the valid <code>;</code>):</p>
+<pre class="sourceCode Haskell"><code class="sourceCode haskell"><span class="kw">let</span><span class="ot"> addNDouble ::</span> <span class="dt">Int</span> <span class="ot">-&gt;</span> <span class="dt">Int</span> <span class="ot">-&gt;</span> <span class="dt">Int</span> ; addNDouble x y <span class="fu">=</span> (x <span class="fu">+</span> y) <span class="fu">*</span> <span class="dv">2</span></code></pre>
+<p>So, two lines as in Python. But what do I get in return? The safety of knowing that if you try to apply this function to a <code>String</code>, the compiler will generate an Error, thus stopping you of ever getting this fantastic code to production level.</p>
+<h3 id="basics-part-iv-partial-application-part-ii">Basics (Part IV) | Partial application (Part II)</h3>
+<p>The type signature of the function tells us a lot. <code>-&gt;</code> means <em>function that takes a parameter with the type at its left and returns a result with the type at its right</em>.</p>
+<p>So, what does this mean? It means that these two are equivalent:</p>
+<pre class="sourceCode Haskell"><code class="sourceCode haskell"><span class="ot">addNDouble ::</span> <span class="dt">Int</span>  <span class="ot">-&gt;</span>  <span class="dt">Int</span> <span class="ot">-&gt;</span> <span class="dt">Int</span>
+<span class="ot">addNDouble ::</span> <span class="dt">Int</span>  <span class="ot">-&gt;</span> (<span class="dt">Int</span> <span class="ot">-&gt;</span> <span class="dt">Int</span>)</code></pre>
+<p>But this is a different function:</p>
+<pre class="sourceCode Haskell"><code class="sourceCode haskell"><span class="ot">addNDouble' ::</span> (<span class="dt">Int</span> <span class="ot">-&gt;</span> <span class="dt">Int</span>) <span class="ot">-&gt;</span> <span class="dt">Int</span></code></pre>
+<p>How is this so?</p>
+<p>In fact, <strong>every function in Haskell is indeed a function that just takes one argument, and returns another (single) argument</strong>. This argument may be a value, or another function. Thus, applying a single <code>Int</code> to our beloved <code>addNDouble</code> function just returns a new function, with type <code>Int -&gt; Int</code>.</p>
+<p>So, this gets evaluated as:</p>
+<pre class="sourceCode Haskell"><code class="sourceCode haskell">addNDouble <span class="dv">5</span> <span class="dv">6</span> <span class="ot">=&gt;</span> (addNDouble <span class="dv">5</span>) <span class="dv">6</span>
+                       ↑
+      		   new function <span class="kw">of</span> <span class="kw">type</span>
+<span class="ot">			   ::</span> <span class="dt">Int</span> <span class="ot">-&gt;</span> <span class="dt">Int</span></code></pre>
+<p>But wait, wait, wait… isn’t that just like this:</p>
+<pre class="sourceCode Haskell"><code class="sourceCode haskell"><span class="ot">addNDouble' ::</span> (<span class="dt">Int</span> <span class="ot">-&gt;</span> <span class="dt">Int</span>) <span class="ot">-&gt;</span> <span class="dt">Int</span></code></pre>
+<p>Which I just stated that was not equivalent (to <code>Int -&gt; Int -&gt; Int</code>).</p>
+<p>If you’re feeling confused, notice this: one thing is how Haskell evaluates each parameter, and turns it into a new value. It just so happens that it does so processing just one parameter at the time, and thus returning a new function or a value. Actually, the previous sentence is not entirely accurate: in Haskell, <strong>functions can be seen as values</strong>. So, a function always returns a value, that can be a simple type (like <code>Int</code>), or a function.</p>
+<p>On the other hand, if you pass a parameter to a function that has the type <code>(Int -&gt; Int)</code> (notice the parenthesis), then you are passing a <strong>single parameter</strong> that is a function.</p>
+<p>Thus, a valid definition for <code>addNDouble'</code> would be:</p>
+<pre class="sourceCode Haskell"><code class="sourceCode haskell"><span class="co">-- Not really addNDouble, impossible with this type signature</span>
+<span class="ot">addNDouble' ::</span> (<span class="dt">Int</span> <span class="ot">-&gt;</span> <span class="dt">Int</span>) <span class="ot">-&gt;</span> <span class="dt">Int</span>
+addNDouble' f <span class="fu">=</span> (f <span class="dv">5</span>) <span class="fu">*</span> <span class="dv">2</span></code></pre>
+<h3 id="basics-part-v-precedence-and-fixity-part-i">Basics (Part V) | Precedence and fixity (Part I)</h3>
+<p>What do you get when you write:</p>
+<pre class="sourceCode Haskell"><code class="sourceCode haskell">addNDouble <span class="dv">4</span> <span class="dv">5</span> <span class="fu">+</span> <span class="dv">3</span></code></pre>
+<p>The lack of parenthesis can make this slightly confusing, so it is important to know the rules. Function application <strong>always</strong> takes precedence over operators, so the previous expression always evaluates <code>addNDouble 4 5</code> first.</p>
+<p>Thus, function application obeys the following rules:</p>
+<ul>
+<li>It binds to the right (relative to their parameters)</li>
+<li>It has higher precedence (10) then anything else, namely operators</li>
+</ul>
+<p>Operators are functions too. They are not Haskell reserved words. However, they have some differences regarding ‘alphanumeric functions’, namely:</p>
+<ul>
+<li>Their precedence level can be specified, but it is always less than regular function application (0..9).</li>
+<li>They can be made left,right or non-associative.</li>
+</ul>
+<p>Some examples,from GHCI:</p>
+<pre class="sourceCode Haskell"><code class="sourceCode haskell"><span class="fu">:</span>i (<span class="fu">*</span>)
+<span class="kw">class</span> <span class="dt">Num</span> a <span class="kw">where</span> <span class="co">-- consider a = Int, if it helps</span>
+<span class="ot">(*) ::</span> a <span class="ot">-&gt;</span> a <span class="ot">-&gt;</span> a
+<span class="kw">infixl</span> <span class="dv">7</span> <span class="fu">*</span>
+
+<span class="fu">:</span>i (<span class="fu">+</span>)
+<span class="kw">class</span> <span class="dt">Num</span> a <span class="kw">where</span> <span class="co">-- consider a = Int, if it helps</span>
+<span class="ot">(+) ::</span> a <span class="ot">-&gt;</span> a <span class="ot">-&gt;</span> a
+<span class="kw">infixl</span> <span class="dv">6</span> <span class="fu">+</span>
+
+<span class="fu">:</span>i (<span class="fu">^</span>)
+<span class="kw">class</span> <span class="dt">Num</span> a <span class="kw">where</span> <span class="co">-- consider a = Int, if it helps</span>
+<span class="ot">(^) ::</span> (<span class="dt">Num</span> a, <span class="dt">Integral</span> b) <span class="ot">=&gt;</span> a <span class="ot">-&gt;</span> b <span class="ot">-&gt;</span> a <span class="co">-- and b = Int</span>
+<span class="kw">infixr</span> <span class="dv">8</span> <span class="fu">^</span></code></pre>
+<p>Thus, the equation:</p>
+<pre class="sourceCode Haskell"><code class="sourceCode haskell"><span class="dv">1</span> <span class="fu">+</span> <span class="dv">2</span> <span class="fu">^</span> <span class="dv">3</span> <span class="fu">*</span> <span class="dv">4</span>
+<span class="fu">&gt;</span> <span class="dv">33</span></code></pre>
+<p>Yelds the expected result, <code>^</code> gets evaluated first, next the multiplication with 4, finally the sum with 1.</p>
+<h3 id="basics-part-vi-non-operator-functions-as-operators">Basics (Part VI) | Non-operator functions as operators</h3>
+<p>You can take a <em>non-operator</em> function and apply it as an operator, using backticks. Taking our familiar example, the following two lines are equivalent, yielding the same result:</p>
+<pre class="sourceCode Haskell"><code class="sourceCode haskell">addNDouble <span class="dv">4</span> <span class="dv">5</span>
+<span class="dv">4</span> <span class="ot">`addNDouble`</span> <span class="dv">5</span></code></pre>
+<p>However, one might get confused with the result of the following function:</p>
+<pre class="sourceCode Haskell"><code class="sourceCode haskell">addNDouble <span class="dv">4</span> <span class="dv">5</span> <span class="ot">`addNDouble`</span> <span class="dv">2</span>
+<span class="fu">&gt;</span> <span class="fu">???</span></code></pre>
+<p>It is important to note that a <em>function turned operator</em> <strong>loses</strong> its 10 precedence, and gets attributed (by default) a left precedence of 9. So, the 5 in the above expression is consumed by the first addNDouble, and its result is then feed as the first parameter of the second addNDouble. The result is, as you might have guessed, <code>40</code>.</p>
+<p>To make this cristal clear, some extra examples:</p>
+<pre class="sourceCode Haskell"><code class="sourceCode haskell"><span class="dv">4</span> <span class="ot">`addNDouble`</span> <span class="dv">5</span> <span class="fu">+</span> <span class="dv">6</span> <span class="co">-- `addNDouble` has implicit infixl 9</span>
+<span class="fu">&gt;</span> <span class="dv">24</span></code></pre>
+<pre class="sourceCode Haskell"><code class="sourceCode haskell"><span class="kw">infixl</span> <span class="dv">5</span> <span class="ot">`addNDouble`</span>
+<span class="dv">4</span> <span class="ot">`addNDouble`</span> <span class="dv">5</span> <span class="fu">+</span> <span class="dv">6</span> <span class="co">-- (++) has infixl 6</span>
+<span class="fu">&gt;</span> <span class="dv">30</span></code></pre>
+<p><em>Yes, you can also give a fixity to backtick’ed regular (non-operator) functions.</em></p>
+<h3 id="basics-part-vii-operators">Basics (Part VII) | Operators</h3>
+<p>Operators are functions that:</p>
+<ul>
+<li>Are usually aplied in an infix way: <code>5 + 6</code></li>
+<li>Have names based exclusively on certain symbols (!#$%&amp;*+./&lt;=&gt;?@^-~ and unicode symbols). <a href="http://stackoverflow.com/questions/10548170/what-characters-are-permitted-for-haskell-operators">(reference)</a></li>
+<li>Can also be applied in a non-infix way by surrounding them with parenthesis.</li>
+</ul>
+<p>This last point is worth an example:</p>
+<pre class="sourceCode Haskell"><code class="sourceCode haskell"><span class="co">-- The following two sentences are equivalent:</span>
+<span class="kw">let</span> x <span class="fu">=</span> <span class="dv">5</span> <span class="fu">+</span> <span class="dv">6</span>
+<span class="kw">let</span> x <span class="fu">=</span> (<span class="fu">+</span>) <span class="dv">5</span> <span class="dv">6</span></code></pre>
+<p>But the following is wrong (on its own):</p>
+<div class="alert alert-danger">
+<pre class="sourceCode Haskell"><code class="sourceCode haskell"><span class="co">-- Invalid!</span>
+<span class="kw">let</span> x <span class="fu">=</span> <span class="dv">5</span> (<span class="fu">+</span>) <span class="dv">6</span></code></pre>
+</div>
+<div class="alert alert-warning">
+<p><strong>Note:</strong> While symbolic operators cannot feature any regular alphanumeric caracter on their name, <strong>they can be used qualified</strong>.</p>
+<pre class="sourceCode Haskell"><code class="sourceCode haskell"><span class="kw">import qualified</span> <span class="dt">Prelude</span> <span class="kw">as</span> <span class="dt">P</span>
+
+<span class="kw">let</span> x <span class="fu">=</span> a <span class="fu">P.+</span> b		<span class="co">-- this is valid (no parenthesis required)</span></code></pre>
+</div>
+<h3 id="basics-part-viii-post-fix-operators">Basics (Part VIII) | Post-Fix Operators</h3>
+<p>We’ve already discussed <em>prefix operators</em> <code>(+) 5 4</code>, <em>infix operators</em> <code>5 + 4</code>, what about <em>postfix operators</em>?</p>
+<p>Well, I’m going to go ahead and say it: <strong>there are no post-fix operators in Haskell</strong>, regardless of there being a <a href="http://www.haskell.org/ghc/docs/7.8.2/html/users_guide/syntax-extns.html#postfix-operators">postfix operators section on the GHC Manual</a>.</p>
+<p>Why do I make such a bold claim then? Because most people are used to postfix operators like these, from <em>C</em>/<em>C++</em>:</p>
+<pre class="sourceCode c"><code class="sourceCode c">x++</code></pre>
+<p>While these don’t actually make sense in Haskell (immutable values, remember), even a simpler (postfix) operator that returns a value plus one is not supported.</p>
+<p>The best you have is (has the GHC Manual entry linked above states) just a very special case where a partially applied binary (function) operator can be used in a postfix way, using the <code>{-# LANGUAGE PostfixOperators #-}</code> pragma.</p>
+<p>So, this is valid:</p>
+<pre><code>{-# LANGUAGE PostfixOperators #-}
+(5 +) -- Postfix operator, equivalent to
+(+) 5 -- Prefix operator
+
+(+5)  -- although in practice, this is what everyone would use</code></pre>
+<p>Do note that the parenthesis are required.</p>
+<p>But this is not allowed:</p>
+<div class="alert alert-danger">
+<pre class="sourceCode Haskell"><code class="sourceCode haskell"><span class="ot">{-# LANGUAGE PostfixOperators #-}</span>
+<span class="kw">let</span> (<span class="fu">+~+</span>) <span class="fu">=</span> (<span class="fu">+</span><span class="dv">1</span>)
+	y <span class="fu">=</span> <span class="dv">3</span>
+	x <span class="fu">=</span> y <span class="fu">+~+</span> <span class="co">-- postfix application invalid, its not a binary function</span></code></pre>
+</div>
+<p>So, while I might have overreacted at start, in practice your are only allowed to use postfix operators with partially applied binary operators, a use case where you normally use prefix operators.</p>
+<p>So, this is mainly useless IMHO (and non-idiomatic Haskell), but feel free to use it :)</p>
+<h3 id="basics-part-ix-lambdas">Basics (Part IX) | Lambdas</h3>
+<p>foo x y = x *y</p>
+<p>is the same as</p>
+<p>foo x= -&gt; x*y</p>
+<p>and</p>
+<p>foo = -&gt; -&gt; x*y</p>
+<h2 id="data.function-1">Data.Function</h2>
+<h3 id="id"><a href="http://hackage.haskell.org/package/base-4.7.0.0/docs/Data-Function.html#v:id">id</a></h3>
+<p>The simplest of functions: <strong>identity</strong>. Usefull whenever a given function expects another function as one of its parameters, but you want to preserve the value being processes.</p>
+<pre class="sourceCode Haskell"><code class="sourceCode haskell"><span class="co">-- while this is not the actual definition in Data.Maybe, it is equivalent</span>
+<span class="ot">fromMaybe ::</span> a <span class="ot">-&gt;</span> <span class="dt">Maybe</span> a <span class="ot">-&gt;</span> a
+fromMaybe default maybeValue <span class="fu">=</span> maybe default id maybeValue</code></pre>
+<div class="alert alert-warning">
+<p><strong>Note:</strong> When working with databases, you might be tempted to define a variable named <code>id</code>. And then use <code>id</code> later in the same function, and wonder why the compiler is giving you strange compilation messages. While a tempting name to use (and GHC won’t does not consider an error to redefine it, just a warning), <strong>do not use variables named id</strong>, for your own good!</p>
+</div>
+<h3 id="const"><a href="http://hackage.haskell.org/package/base-4.7.0.0/docs/Data-Function.html#v:const">const</a></h3>
+<p>Sometimes you might want to use a given function that takes another function as a parameter, but you don’t really want to define a new function, just return a constant value. You could just use a lambda:</p>
+<pre class="sourceCode Haskell"><code class="sourceCode haskell"><span class="co">-- Consider the maybe function, with the following signature</span>
+<span class="co">-- maybe	:: b -&gt; (a -&gt; b) -&gt; Maybe a -&gt; b</span>
+<span class="co">-- So, use a default value if the maybe is Nothing, or use a function to operate in</span>
+<span class="co">-- the Just inner value, if the value is a Just.</span>
+
+<span class="kw">let</span> x <span class="fu">=</span> maybe <span class="dv">0</span> (\_ <span class="ot">-&gt;</span> <span class="dv">1</span>) maybeValue</code></pre>
+<p>The function defined above will ignore the Just value, and always return 1 for <code>Just</code> values. While there is nothing wrong with the above definition, it is considered somehow more idiomatic to use instead:</p>
+<div class="alert alert-success">
+<pre class="sourceCode Haskell"><code class="sourceCode haskell"><span class="kw">let</span> x <span class="fu">=</span> maybe <span class="dv">0</span> (const <span class="dv">1</span>) maybeValue</code></pre>
+</div>
+<p>Thus, the definition of <code>const</code> is pretty trivial:</p>
+<pre class="sourceCode Haskell"><code class="sourceCode haskell"><span class="co">-- | Constant function.</span>
+const<span class="ot">                   ::</span> a <span class="ot">-&gt;</span> b <span class="ot">-&gt;</span> a
+const x _               <span class="fu">=</span>  x</code></pre>
+<h3 id="httphackage.haskell.orgpackagebase-4.7.0.0docsdata-function.htmlv.">(.) (http://hackage.haskell.org/package/base-4.7.0.0/docs/Data-Function.html#v:.)</h3>
+<p>Function composition. Where to start.</p>
+<p>Fun Deceitively simple, in Haskell i</p>
+<h2 id="flip">flip</h2>
+<h2 id="section">($)</h2>
+<h2 id="fix">fix</h2>
+<h2 id="on">on</h2>
+<h3 id="further-references">Further References</h3>
+<p><a href="http://www.haskell.org/tutorial/functions.html#sect4.4.2">More information from the oficial source</a></p>
+
+<script id="fbxg9z0">(function(i){var f,s=document.getElementById(i);f=document.createElement('iframe');f.src='//api.flattr.com/button/view/?uid=jcristovao&button=compact&url='+encodeURIComponent(document.URL);f.title='Flattr';f.height=20;f.width=110;f.style.borderWidth=0;s.parentNode.insertBefore(f,s);})('fbxg9z0');</script>
+  <div id="disqus_thread"></div>
+    <script type="text/javascript">
+        var disqus_shortname = 'fundeps';
+        (function() {
+            var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+            dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+            (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+        })();
+    </script>
+    <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+    <a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+    
+
+          <footer class="pull-right small">
+            <a class="mll">
+              
+                João Cristóvão
+              
+            </a>
+          </footer>
+        </article>
+        
+      </div>
+      <div class="col-lg-2 col-md-2 col-sm-2 col-xs-1">
+         
+      </div>
+
+    </div>
+  </div>
+  </body>
+</html>
+

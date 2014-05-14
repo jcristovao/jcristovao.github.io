@@ -8,8 +8,379 @@
         <name>Joao Cristovao</name>
         <email>jmacristovao@gmail.com</email>
     </author>
-    <updated>2014-03-12T00:00:00Z</updated>
+    <updated>2014-05-14T00:00:00Z</updated>
     <entry>
+    <title>Not about arrows</title>
+    <link href="http://fundeps.com/posts/cheatsheets/2014-05-14-Not-about-arrows/index.html" />
+    <id>http://fundeps.com/posts/cheatsheets/2014-05-14-Not-about-arrows/index.html</id>
+    <published>2014-05-14T00:00:00Z</published>
+    <updated>2014-05-14T00:00:00Z</updated>
+    <summary type="html"><![CDATA[<p><em>tl;dr:</em> Useful arrow combinators everyone uses without really caring for arrows.</p>
+<p>Or <strong><em>arrow combinators for dummies</em></strong>.</p>
+<!---
+***Index***:
+
+* [Not about arrows](#not-about-arrows)
+* [What am I missing?](#what-am-i-missing)
+    - [Either](#either)
+    - [Tuple] (#tupple-pair)
+* [Examples, please!](#examples-please)
+* [But how does this work?](#how-does-this-work)
+* [Is this the right abstraction?](#is-this-the-right-abstraction]
+* [Cheatsheet](#cheatsheet)
+-->
+
+<h2 id="not-about-arrows">Not about arrows</h2>
+<p>This post is not about arrows <em>per se</em>.</p>
+<p>In fact, while arrows are seen as <a href="http://www.haskell.org/arrows/">“a new abstract view of computation (…) as monads (…) but more general”</a>, many Haskell users <em>don’t really care for this</em>. They just use <em>some arrow functions</em> because they implement useful <a href="http://hackage.haskell.org/package/base-4.7.0.0/docs/Data-Either.html">Either</a> and <a href="http://hackage.haskell.org/package/base-4.7.0.0/docs/Data-Tuple.html">Tuple</a> combinators.</p>
+<p>While there are already <a href="https://en.wikibooks.org/wiki/Haskell/Understanding_arrows">good</a> arrow tutorials, if you’re a begginer, you’ll probably gloss over them, and conclude they seem over complicated for what you are doing.</p>
+<p>Heck, don’t even get me started on the <a href="http://hackage.haskell.org/package/base-4.7.0.0/docs/Control-Arrow.html">Control.Arrow module documentation</a>.</p>
+<p>I remember thinking: let me get these monads straight, then monad transformers, those are also quite used, <em>then</em> I’ll consider arrows. And I argue that many haskellers never do get to that point…</p>
+<h2 id="what-am-i-missing">What am I missing?</h2>
+<p>One of Arrow instances is function application, or <code>-&gt;</code>.</p>
+<p>How is that useful?</p>
+<h3 id="either">Either</h3>
+<p>Many of you have probably wondered why there aren’t functions on <a href="http://hackage.haskell.org/package/base-4.7.0.0/docs/Data-Either.html">base</a> to map the <code>Left</code> part of an Either, or even both <code>Left</code> and <code>Right</code>.</p>
+<p>You are <a href="http://www.haskell.org/pipermail/libraries/2014-April/022679.html">not</a> <a href="https://stackoverflow.com/questions/13503965/mapping-over-eithers-left">alone</a>. My guess is that this question will just keep on poping until proper documentation is added to Data.Either.</p>
+<p>While you might later find these defined in the very useful module <a href="http://hackage.haskell.org/package/either">either</a>, namely <a href="http://hackage.haskell.org/package/either-4.1.1/docs/Data-Either-Combinators.html">Data.Either.Combinators</a>, as <a href="https://hackage.haskell.org/package/either-4.1.1/docs/Data-Either-Combinators.html#v:mapLeft">mapLeft</a> and <a href="http://hackage.haskell.org/package/either-4.1.1/docs/Data-Either-Combinators.html#v:mapBoth">mapBoth</a>, what you might miss is that you don’t require an extra package to get this: you can use <code>Control.Arrow</code> from base!</p>
+<pre class="sourceCode Haskell"><code class="sourceCode haskell"><span class="co">-- Apply a function  to the left side of an Either</span>
+<span class="co">-- The same as &#39;mapLeft&#39; from Data.Either.Combinators</span>
+<span class="ot">left ::</span> (b <span class="ot">-&gt;</span> c) <span class="ot">-&gt;</span> <span class="dt">Either</span> b d <span class="ot">-&gt;</span> <span class="dt">Either</span> c d
+
+<span class="co">-- Apply a function to the right side of an Either</span>
+<span class="co">-- the same as &#39;mapRight&#39; from Data.Either.Combinators</span>
+<span class="co">-- but you should just used &#39;fmap&#39; instead</span>
+<span class="ot">right ::</span> (b <span class="ot">-&gt;</span> c) <span class="ot">-&gt;</span> <span class="dt">Either</span> d b <span class="ot">-&gt;</span> <span class="dt">Either</span> d c
+
+<span class="co">-- Apply one of the provided functions to the Either value,</span>
+<span class="co">-- resulting from the case analysis.</span>
+<span class="co">-- The same as &#39;mapBoth&#39; from Data.Either.Combinators</span>
+<span class="ot">(+++) ::</span> (b <span class="ot">-&gt;</span> c) <span class="ot">-&gt;</span> (b&#39; <span class="ot">-&gt;</span> c&#39;) <span class="ot">-&gt;</span> <span class="dt">Either</span> b b&#39; <span class="ot">-&gt;</span> <span class="dt">Either</span> c c&#39;
+
+<span class="co">-- Case analysis.</span>
+<span class="co">-- The same as &#39;either&#39;</span>
+<span class="ot">(|||) ::</span> (b <span class="ot">-&gt;</span> d) <span class="ot">-&gt;</span> (c <span class="ot">-&gt;</span> d) <span class="ot">-&gt;</span> <span class="dt">Either</span> b c <span class="ot">-&gt;</span> d</code></pre>
+<h3 id="tuple-pair">2-Tuple (Pair)</h3>
+<p>Another usefull set of arrow combinators applies to Tuples:</p>
+<pre class="sourceCode Haskell"><code class="sourceCode haskell"><span class="co">-- Apply a function to first pair element</span>
+<span class="ot">first ::</span> (b <span class="ot">-&gt;</span> c) <span class="ot">-&gt;</span> (b,d) <span class="ot">-&gt;</span> (c,d)
+
+<span class="co">-- Apply a function to second pair element</span>
+<span class="co">-- but you should just use &#39;fmap&#39; instead</span>
+<span class="ot">second ::</span> (b <span class="ot">-&gt;</span> c) <span class="ot">-&gt;</span> (d,b) <span class="ot">-&gt;</span> (d,c)
+
+<span class="co">-- Apply the first function to the first element,</span>
+<span class="co">-- and the second function to the second element.</span>
+<span class="ot">(***) ::</span> (b <span class="ot">-&gt;</span> c) <span class="ot">-&gt;</span> (b&#39; <span class="ot">-&gt;</span> c&#39;) <span class="ot">-&gt;</span> (b,b&#39;) <span class="ot">-&gt;</span> (c,c&#39;)
+
+<span class="co">-- Value to pair (fanout)</span>
+<span class="ot">(&amp;&amp;&amp;) ::</span> (b <span class="ot">-&gt;</span> c) <span class="ot">-&gt;</span> (b <span class="ot">-&gt;</span> c&#39;) <span class="ot">-&gt;</span> b <span class="ot">-&gt;</span> (c,c&#39;)</code></pre>
+<h2 id="examples-please">Examples, please!</h2>
+<h3 id="modify-both-elements-of-a-tuple">Modify both elements of a tuple</h3>
+<p><small style="color:brown">the following examples can be copy-pasted into ghci</small></p>
+<p>Lets say you’ve got a string that you want to quickly split into two, and process each part independently. You could use <a href="http://hackage.haskell.org/package/attoparsec">attoparsec</a>, but perhaps for a one time use you would prefer to avoid adding any other module.</p>
+<p>So, you start by using <a href="http://hackage.haskell.org/package/base-4.7.0.0/docs/Prelude.html#v:break"><code>break</code></a>:</p>
+<pre class="sourceCode Haskell"><code class="sourceCode haskell"><span class="kw">let</span> x           <span class="fu">=</span> <span class="st">&quot;1_test&quot;</span>
+<span class="kw">let</span> splitPair <span class="fu">=</span> break (<span class="fu">==</span><span class="ch">&#39;_&#39;</span>) x    <span class="co">-- (&quot;1&quot;,&quot;_test&quot;)</span></code></pre>
+<p>And now, you would like to <code>read</code> the first tuple element, and drop the underscore from the second. Usually, you would do this:</p>
+<pre class="sourceCode Haskell"><code class="sourceCode haskell"><span class="kw">let</span><span class="ot"> numStr ::</span> (<span class="dt">Int</span>,<span class="dt">String</span>) ; numStr <span class="fu">=</span> (\(a,b) <span class="ot">-&gt;</span> (read a, drop <span class="dv">1</span> b)) splitPair</code></pre>
+<p>And you get the intended <code>(1,&quot;test&quot;)</code></p>
+<p>Now, how would you do this with arrows?</p>
+<pre class="sourceCode Haskell"><code class="sourceCode haskell"><span class="kw">import </span><span class="dt">Control.Arrow</span>
+(<span class="fu">...</span>)
+<span class="kw">let</span><span class="ot"> numStr ::</span> (<span class="dt">Int</span>,<span class="dt">String</span>) ; numStr <span class="fu">=</span> read <span class="fu">***</span> drop <span class="dv">1</span> <span class="fu">$</span> splitPair</code></pre>
+<p>Much cleaner.</p>
+<h3 id="change-the-left-type-of-a-either">Change the Left type of a Either</h3>
+<p>Since a <code>Monad</code> takes a type constructor with exactly one type, it is not possible to provide a <code>Monad</code> instance for <code>Either</code> alone. You must specify its <code>Left</code> type (hence fixing it).</p>
+<p>A simple example:</p>
+<div class="alert alert-danger">
+<pre class="sourceCode Haskell"><code class="sourceCode haskell"><span class="ot">{-# LANGUAGE OverloadedStrings #-}</span>
+<span class="kw">import </span><span class="dt">Data.Either</span>
+<span class="kw">import </span><span class="dt">Data.Text</span>
+<span class="kw">import </span><span class="dt">Control.Arrow</span>
+<span class="kw">import </span><span class="dt">Control.Applicative</span>
+
+<span class="co">-- Lets say most of our code is on the Either Text Int monad...</span>
+<span class="ot">f ::</span> <span class="dt">Int</span> <span class="ot">-&gt;</span> <span class="dt">Either</span> <span class="dt">Text</span> <span class="dt">Int</span>
+f x <span class="fu">=</span> <span class="kw">if</span> x <span class="fu">&gt;</span> <span class="dv">0</span> <span class="kw">then</span> <span class="dt">Right</span> x
+               <span class="kw">else</span> <span class="dt">Left</span> <span class="st">&quot;Not bigger than 0&quot;</span>
+
+<span class="co">-- But by an unfortunate event, we need to use a function</span>
+<span class="co">-- that returns a different Left type</span>
+<span class="ot">g ::</span> <span class="dt">Int</span> <span class="ot">-&gt;</span> <span class="dt">Either</span> <span class="dt">String</span> <span class="dt">Int</span>
+g y <span class="fu">=</span> <span class="kw">if</span> y <span class="ot">`mod`</span> <span class="dv">3</span> <span class="fu">==</span> <span class="dv">0</span> <span class="kw">then</span> <span class="dt">Right</span> y
+                        <span class="kw">else</span> <span class="dt">Left</span> <span class="st">&quot;Not divisible by 3&quot;</span>
+
+<span class="ot">eitherMonad ::</span> <span class="dt">Int</span> <span class="ot">-&gt;</span> <span class="dt">Int</span> <span class="ot">-&gt;</span> <span class="dt">Int</span> <span class="ot">-&gt;</span> <span class="dt">Int</span> <span class="ot">-&gt;</span> <span class="dt">Either</span> <span class="dt">Text</span> <span class="dt">Int</span>
+eitherMonad x y w z <span class="fu">=</span> <span class="kw">do</span>
+  a <span class="ot">&lt;-</span> f x
+  b <span class="ot">&lt;-</span> g y <span class="co">-- it fails here! g is a different monad!</span>
+  c <span class="ot">&lt;-</span> f w
+  d <span class="ot">&lt;-</span> f z
+  return <span class="fu">$</span> a <span class="fu">*</span> b <span class="fu">+</span> <span class="dv">2</span> <span class="fu">*</span> c <span class="fu">+</span> d
+
+main <span class="fu">=</span> <span class="kw">do</span>
+  print <span class="fu">$</span> eitherMonad <span class="dv">1</span> <span class="dv">2</span> <span class="dv">3</span> <span class="dv">4</span> <span class="co">-- not divisible by 3</span>
+  print <span class="fu">$</span> eitherMonad <span class="dv">1</span> <span class="dv">9</span> <span class="dv">0</span> <span class="dv">4</span> <span class="co">-- not bigger than 0</span>
+  print <span class="fu">$</span> eitherMonad <span class="dv">0</span> <span class="dv">1</span> <span class="dv">3</span> <span class="dv">4</span> <span class="co">-- not divisible by 3</span>
+                              <span class="co">-- it only reports the first left</span>
+  print <span class="fu">$</span> eitherMonad <span class="dv">1</span> <span class="dv">9</span> <span class="dv">3</span> <span class="dv">4</span> <span class="co">-- it should return 19</span>
+                              <span class="co">-- but it doesn&#39;t, because this </span>
+                              <span class="co">-- code does not compile</span></code></pre>
+</div>
+<p>Using <code>left</code>, we can modify the <code>Left</code> side of the <code>Either</code>, and thus keep working in the same monad:</p>
+<div class="alert alert-success">
+<pre class="sourceCode Haskell"><code class="sourceCode haskell"><span class="ot">{-# LANGUAGE OverloadedStrings #-}</span>
+<span class="kw">import </span><span class="dt">Data.Either</span>
+<span class="kw">import </span><span class="dt">Data.Text</span>
+<span class="kw">import </span><span class="dt">Control.Arrow</span>
+<span class="kw">import </span><span class="dt">Control.Applicative</span>
+
+<span class="co">-- Lets say most of our code is on the Either Text Int monad...</span>
+<span class="ot">f ::</span> <span class="dt">Int</span> <span class="ot">-&gt;</span> <span class="dt">Either</span> <span class="dt">Text</span> <span class="dt">Int</span>
+f x <span class="fu">=</span> <span class="kw">if</span> x <span class="fu">&gt;</span> <span class="dv">0</span> <span class="kw">then</span> <span class="dt">Right</span> x
+               <span class="kw">else</span> <span class="dt">Left</span> <span class="st">&quot;Not bigger than 0&quot;</span>
+
+<span class="co">-- But by an unfortunate event, we need to use a function</span>
+<span class="co">-- that returns a different Left type</span>
+<span class="ot">g ::</span> <span class="dt">Int</span> <span class="ot">-&gt;</span> <span class="dt">Either</span> <span class="dt">String</span> <span class="dt">Int</span>
+g y <span class="fu">=</span> <span class="kw">if</span> y <span class="ot">`mod`</span> <span class="dv">3</span> <span class="fu">==</span> <span class="dv">0</span> <span class="kw">then</span> <span class="dt">Right</span> y
+                        <span class="kw">else</span> <span class="dt">Left</span> <span class="st">&quot;Not divisible by 3&quot;</span>
+
+<span class="ot">eitherMonad ::</span> <span class="dt">Int</span> <span class="ot">-&gt;</span> <span class="dt">Int</span> <span class="ot">-&gt;</span> <span class="dt">Int</span> <span class="ot">-&gt;</span> <span class="dt">Int</span> <span class="ot">-&gt;</span> <span class="dt">Either</span> <span class="dt">Text</span> <span class="dt">Int</span>
+eitherMonad x y w z <span class="fu">=</span> <span class="kw">do</span>
+  a <span class="ot">&lt;-</span> f x
+  b <span class="ot">&lt;-</span> left pack <span class="fu">$</span> g y <span class="co">-- it now works!</span>
+  c <span class="ot">&lt;-</span> f w
+  d <span class="ot">&lt;-</span> f z
+  return <span class="fu">$</span> a <span class="fu">*</span> b <span class="fu">+</span> <span class="dv">2</span> <span class="fu">*</span> c <span class="fu">+</span> d
+
+main <span class="fu">=</span> <span class="kw">do</span>
+  print <span class="fu">$</span> eitherMonad <span class="dv">1</span> <span class="dv">2</span> <span class="dv">3</span> <span class="dv">4</span> <span class="co">-- not divisible by 3</span>
+  print <span class="fu">$</span> eitherMonad <span class="dv">1</span> <span class="dv">9</span> <span class="dv">0</span> <span class="dv">4</span> <span class="co">-- not bigger than 0</span>
+  print <span class="fu">$</span> eitherMonad <span class="dv">0</span> <span class="dv">1</span> <span class="dv">3</span> <span class="dv">4</span> <span class="co">-- not divisible by 3</span>
+                              <span class="co">-- it only reports the first left</span>
+  print <span class="fu">$</span> eitherMonad <span class="dv">1</span> <span class="dv">9</span> <span class="dv">3</span> <span class="dv">4</span> <span class="co">-- OK! returns 19</span>
+                                                                                                                               </code></pre>
+</div>
+<h2 id="but-how-does-this-all-work">But how does this all work?</h2>
+<p>The strange thing is when you look at the functions signatures in <code>Control.Arrow</code>, they do not seem applicable:</p>
+<pre class="sourceCode Haskell"><code class="sourceCode haskell">
+<span class="co">-- | Feed marked inputs through the argument arrow,</span>
+<span class="co">--   passing the rest through unchanged to the output.</span>
+<span class="ot">left ::</span> a b c <span class="ot">-&gt;</span> a (<span class="dt">Either</span> b d) (<span class="dt">Either</span> c d)
+
+<span class="co">-- | A mirror image of left.</span>
+<span class="ot">right ::</span> a b c <span class="ot">-&gt;</span> a (<span class="dt">Either</span> d b) (<span class="dt">Either</span> d c)
+
+<span class="co">-- | Split the input between the two argument arrows,</span>
+<span class="co">--   retagging and merging their outputs.</span>
+<span class="ot">(+++) ::</span> a b c <span class="ot">-&gt;</span> a b&#39; c&#39; <span class="ot">-&gt;</span> a (<span class="dt">Either</span> b b&#39;) (<span class="dt">Either</span> c c&#39;) 
+
+<span class="co">-- | Fanin: Split the input between the two argument arrows </span>
+<span class="co">--   and merge their outputs.</span>
+<span class="ot">(|||) ::</span> a b d <span class="ot">-&gt;</span> a c d <span class="ot">-&gt;</span> a (<span class="dt">Either</span> b c) d </code></pre>
+<p>However, if you consider that function application, also represente as an <code>-&gt;</code>, is an instance of <code>Arrow</code>, things get more clear… How? Just replace <code>a</code> with <code>-&gt;</code>:</p>
+<pre class="sourceCode Haskell"><code class="sourceCode haskell">
+<span class="co">-- | Feed marked inputs through the argument arrow,</span>
+<span class="co">--   passing the rest through unchanged to the output.</span>
+<span class="ot">left ::</span> a    b c <span class="ot">-&gt;</span> a    (<span class="dt">Either</span> b d)  (<span class="dt">Either</span> c d)
+<span class="ot">     ::</span> (<span class="ot">-&gt;</span>) b c <span class="ot">-&gt;</span> (<span class="ot">-&gt;</span>) (<span class="dt">Either</span> b d)  (<span class="dt">Either</span> c d) 
+<span class="ot">     ::</span> (b <span class="ot">-&gt;</span> c) <span class="ot">-&gt;</span>       <span class="dt">Either</span> b d <span class="ot">-&gt;</span> <span class="dt">Either</span> c d
+
+<span class="co">-- | A mirror image of left.</span>
+<span class="ot">right ::</span> a    b c <span class="ot">-&gt;</span> a    (<span class="dt">Either</span> d b)  (<span class="dt">Either</span> d c) 
+<span class="ot">      ::</span> (<span class="ot">-&gt;</span>) b c <span class="ot">-&gt;</span> (<span class="ot">-&gt;</span>) (<span class="dt">Either</span> d b)  (<span class="dt">Either</span> d c) 
+<span class="ot">      ::</span> (b <span class="ot">-&gt;</span> c) <span class="ot">-&gt;</span>       <span class="dt">Either</span> d b <span class="ot">-&gt;</span> <span class="dt">Either</span> d c
+
+<span class="co">-- | Split the input between the two argument arrows,</span>
+<span class="co">--   retagging and merging their outputs.</span>
+<span class="ot">(+++) ::</span> a    b c <span class="ot">-&gt;</span> a    b&#39; c&#39; <span class="ot">-&gt;</span> a    (<span class="dt">Either</span> b b&#39;)  (<span class="dt">Either</span> c c&#39;) 
+<span class="ot">      ::</span> (<span class="ot">-&gt;</span>) b c <span class="ot">-&gt;</span> (<span class="ot">-&gt;</span>) b&#39; c&#39; <span class="ot">-&gt;</span> (<span class="ot">-&gt;</span>) (<span class="dt">Either</span> b b&#39;)  (<span class="dt">Either</span> c c&#39;) 
+<span class="ot">      ::</span> (b <span class="ot">-&gt;</span> c) <span class="ot">-&gt;</span> (b&#39; <span class="ot">-&gt;</span> c&#39;) <span class="ot">-&gt;</span>       <span class="dt">Either</span> b b&#39; <span class="ot">-&gt;</span> <span class="dt">Either</span> c c&#39;
+
+<span class="co">-- | Fanin: Split the input between the two argument arrows </span>
+<span class="co">--   and merge their outputs.</span>
+<span class="ot">(|||) ::</span> a    b d <span class="ot">-&gt;</span> a    c d <span class="ot">-&gt;</span> a    (<span class="dt">Either</span> b c)   d 
+<span class="ot">      ::</span> (<span class="ot">-&gt;</span>) b d <span class="ot">-&gt;</span> (<span class="ot">-&gt;</span>) c d <span class="ot">-&gt;</span> (<span class="ot">-&gt;</span>) (<span class="dt">Either</span> b c)   d
+<span class="ot">      ::</span> (b <span class="ot">-&gt;</span> d) <span class="ot">-&gt;</span> (c <span class="ot">-&gt;</span> d) <span class="ot">-&gt;</span>       <span class="dt">Either</span> b c <span class="ot">-&gt;</span> d</code></pre>
+<p>And the same applies for Pairs:</p>
+<pre class="sourceCode haskell"><code class="sourceCode haskell"><span class="co">-- | send the first component of the input through the argument </span>
+<span class="co">-- arrow, and copy the rest unchanged to the output.</span>
+<span class="ot">first ::</span> a    b c <span class="ot">-&gt;</span> a    (b, d)   (c,d)
+<span class="ot">      ::</span> (<span class="ot">-&gt;</span>) b c <span class="ot">-&gt;</span> (<span class="ot">-&gt;</span>) (b,d)    (c,d)
+<span class="ot">      ::</span> (b <span class="ot">-&gt;</span> c) <span class="ot">-&gt;</span>      (b,d) <span class="ot">-&gt;</span> (c,d)
+     
+<span class="co">-- | a mirror image of first.</span>
+<span class="ot">second ::</span> a    b c <span class="ot">-&gt;</span> a     (d, b)    (d, c)
+<span class="ot">       ::</span> (<span class="ot">-&gt;</span>) b c <span class="ot">-&gt;</span> (<span class="ot">-&gt;</span>)  (d, b)    (d, c)
+<span class="ot">       ::</span> (b <span class="ot">-&gt;</span> c) <span class="ot">-&gt;</span>       (d, b) <span class="ot">-&gt;</span> (d, c)
+
+
+<span class="co">-- | split the input between the two argument arrows</span>
+<span class="co">--   and combine their output.</span>
+<span class="ot">(***) ::</span> a    b c <span class="ot">-&gt;</span> a    b&#39; c&#39; <span class="ot">-&gt;</span> a    (b, b&#39;)    (c, c&#39;)
+<span class="ot">      ::</span> (<span class="ot">-&gt;</span>) b c <span class="ot">-&gt;</span> (<span class="ot">-&gt;</span>) b&#39; c&#39; <span class="ot">-&gt;</span> (<span class="ot">-&gt;</span>) (b, b&#39;)    (c, c&#39;)
+<span class="ot">      ::</span> (b <span class="ot">-&gt;</span> c) <span class="ot">-&gt;</span> (b&#39; <span class="ot">-&gt;</span> c&#39;) <span class="ot">-&gt;</span>      (b, b&#39;) <span class="ot">-&gt;</span> (c, c&#39;)
+
+<span class="co">-- | fanout: send the input to both argument arrows</span>
+<span class="co">--   and combine their output.</span>
+<span class="ot">(&amp;&amp;&amp;) ::</span> a    b c <span class="ot">-&gt;</span> a    b c&#39; <span class="ot">-&gt;</span> a    b    (c, c&#39;)
+<span class="ot">      ::</span> (<span class="ot">-&gt;</span>) b c <span class="ot">-&gt;</span> (<span class="ot">-&gt;</span>) b c&#39; <span class="ot">-&gt;</span> (<span class="ot">-&gt;</span>) b    (c, c&#39;)
+<span class="ot">      ::</span> (b <span class="ot">-&gt;</span> c) <span class="ot">-&gt;</span> (b <span class="ot">-&gt;</span> c&#39;) <span class="ot">-&gt;</span>      b <span class="ot">-&gt;</span> (c, c&#39;)</code></pre>
+<h2 id="is-this-the-right-abstraction">Is this the right abstraction?</h2>
+<p>The <a href="http://www.haskell.org/pipermail/libraries/2014-April/022777.html">current</a> <a href="http://www.haskell.org/pipermail/libraries/2014-April/022844.html">effort</a> to add more straigh forward functions to <code>Data.Either</code> and <code>Data.Tuple</code> ended with the conclusiong that <a href="http://hackage.haskell.org/package/bifunctors-3.2.0.1/docs/Data-Bifunctor.html">Bifunctors</a> should be added to base.</p>
+<p>Bifunctors are really nice, and a much more (IMHO) logical way to present these operators. Take any given type constructor that parameterizes over two types, make it pass some very obvious rules (<code>bimap id id ≡ id</code>), and you got yourself something that it is just like a <code>Functor</code>, but for “bi-types”.</p>
+<p>So, <code>Either</code> is an instance, and so is <code>(,)</code>. And the equivalent functions are the very obvious:</p>
+<pre class="sourceCode Haskell"><code class="sourceCode haskell"><span class="kw">class</span> <span class="dt">Bifunctor</span> p <span class="kw">where</span>
+    <span class="co">-- |  Map over both arguments at the same time.</span>
+<span class="ot">    bimap ::</span> (a <span class="ot">-&gt;</span> b) <span class="ot">-&gt;</span> (c <span class="ot">-&gt;</span> d) <span class="ot">-&gt;</span> p a c <span class="ot">-&gt;</span> p b d
+
+    <span class="co">-- | Map covariantly over the first argument.</span>
+<span class="ot">    first ::</span> (a <span class="ot">-&gt;</span> b) <span class="ot">-&gt;</span> p a c <span class="ot">-&gt;</span> p b c
+
+    <span class="co">-- | Map covariantly over the second argument.</span>
+<span class="ot">    second ::</span> (b <span class="ot">-&gt;</span> c) <span class="ot">-&gt;</span> p a b <span class="ot">-&gt;</span> p a c</code></pre>
+<p>While this is, IMHO, not a bad outcome at all, I still feel that more straight-forward functions would do more good than harm, namely easing the way for Haskell newbies.</p>
+<p>But the <code>Bifunctor</code> is a very usefull (and logical) abstraction, and it is definitelly most welcomed.</p>
+<h2 id="cheatsheet">Cheatsheet</h2>
+<p>So, arrows operators can be quite useful for types that are parameterized over two types: <a href="http://hackage.haskell.org/package/base-4.7.0.0/docs/Data-Either.html">Either</a> for choice, <a href="http://hackage.haskell.org/package/base-4.7.0.0/docs/Data-Tuple.html">Tuple</a> for combinations.</p>
+<table class="table table-striped">
+  <thead>
+    <tr>
+        <th>
+Apply function to
+</th>
+        <th>
+Type
+</th>
+        <th>
+Arrow<br />Operator
+</th>
+        <th>
+Alternative<br />in Base
+</th>
+        <th>
+Alternative<br />in <a href="https://hackage.haskell.org/package/either">either</a>
+</th>
+        <th>
+Alternative<br />in <a href="http://hackage.haskell.org/package/bifunctors">bifunctor</a>
+</th>
+        </tr>
+  </thead>
+  <tbody class="table-striped">
+    <tr><td>
+First type
+</td>
+		<td>
+Either
+</td>
+		<td>
+<a href="http://hackage.haskell.org/package/base-4.7.0.0/docs/Control-Arrow.html#v:left">left</a>
+</td>
+        <td></td>
+        <td>
+<a href="https://hackage.haskell.org/package/either-4.1.1/docs/Data-Either-Combinators.html#v:mapLeft">mapLeft</a>
+</td>
+        <td>
+<a href="http://hackage.haskell.org/package/bifunctors-3.2.0.1/docs/Data-Bifunctor.html#v:first">first</a>
+</td>
+    </tr>
+    <tr><td>            </td>
+		<td>
+(,)
+</td>
+		<td>
+<a href="http://hackage.haskell.org/package/base-4.7.0.0/docs/Control-Arrow.html#v:first">first</a>
+</td>
+        <td></td>
+        <td></td>
+        <td>
+<a href="http://hackage.haskell.org/package/bifunctors-3.2.0.1/docs/Data-Bifunctor.html#v:first">first</a>
+</td>
+    </tr>
+    <tr><td>
+Second type
+</td>
+		<td>
+Either
+</td>
+		<td>
+<a href="http://hackage.haskell.org/package/base-4.7.0.0/docs/Control-Arrow.html#v:right">right</a>
+</td>
+        <td>
+<a href="http://hackage.haskell.org/package/base-4.7.0.0/docs/Prelude.html#v:fmap">fmap</a>
+</td>
+        <td></td>
+        <td>
+<a href="http://hackage.haskell.org/package/bifunctors-3.2.0.1/docs/Data-Bifunctor.html#v:second">second</a>
+</td>
+    </tr>
+    <tr><td>            </td>
+		<td>
+(,)
+</td>
+		<td>
+<a href="http://hackage.haskell.org/package/base-4.7.0.0/docs/Control-Arrow.html#v:second">second</a>
+</td>
+        <td>
+<a href="http://hackage.haskell.org/package/base-4.7.0.0/docs/Prelude.html#v:fmap">fmap</a>
+</td>
+        <td>
+<a href="https://hackage.haskell.org/package/either-4.1.1/docs/Data-Either-Combinators.html#v:mapRight">mapRight</a>
+</td>
+        <td>
+<a href="http://hackage.haskell.org/package/bifunctors-3.2.0.1/docs/Data-Bifunctor.html#v:second">second</a>
+</td>
+    </tr>
+    <tr><td>
+Both types
+</td>
+		<td>
+Either
+</td>
+		<td>
+<a href="http://hackage.haskell.org/package/base-4.7.0.0/docs/Control-Arrow.html#v:-43--43--43-">(+++)</a>
+</td>
+        <td></td>
+        <td>
+<a href="https://hackage.haskell.org/package/either-4.1.1/docs/Data-Either-Combinators.html#v:mapBoth">mapBoth</a>
+</td>
+        <td>
+<a href="http://hackage.haskell.org/package/bifunctors-3.2.0.1/docs/Data-Bifunctor.html#v:bimap">bimap</a>
+</td>
+    </tr>
+    <tr><td>            </td>
+		<td>
+(,)
+</td>
+		<td>
+<a href="http://hackage.haskell.org/package/base-4.7.0.0/docs/Control-Arrow.html#v:-42--42--42-">(***)</a>
+</td>
+        <td></td>
+        <td></td>
+        <td>
+<a href="http://hackage.haskell.org/package/bifunctors-3.2.0.1/docs/Data-Bifunctor.html#v:bimap">bimap</a>
+</td>
+    </tr>
+  </tbody>
+</table>
+
+
+<h2 id="function-composition">Function composition</h2>
+<p>Finally, there is yet another gem hidden in the <code>-&gt;</code> instance of <code>Arrow</code>: function composition.</p>
+<pre class="sourceCode Haskell"><code class="sourceCode haskell"><span class="co">-- | Left-to-right composition</span>
+<span class="ot">(&gt;&gt;&gt;) ::</span> <span class="dt">Category</span> cat <span class="ot">=&gt;</span> cat a b <span class="ot">-&gt;</span> cat b c <span class="ot">-&gt;</span> cat a c 
+
+<span class="co">-- | Right-to-left composition</span>
+<span class="ot">(&lt;&lt;&lt;) ::</span> <span class="dt">Category</span> cat <span class="ot">=&gt;</span> cat b c <span class="ot">-&gt;</span> cat a b <span class="ot">-&gt;</span> cat a c </code></pre>
+<p>Where again, replacing <code>cat</code> with <code>-&gt;</code> gets you the expected result. However, once again, there is a better abstraction for this.</p>
+<p>If you only need left-to-right function composition, you should probably just import <a href="http://hackage.haskell.org/package/base-4.6.0.0/docs/Control-Category.html">Control.Category</a>, which has been on <code>Base</code> at least since version 4.0.</p>
+<h2 id="conclusion">Conclusion</h2>
+<p>I hope you have liked this introductory text. Please let me know what you think, and if you found any error or typo. None of this is especially new, but my intent was to join all this information in one place. If there is an equivalent guide somewhere else, please let me know.</p>
+<p>Cheers, João</p>]]></summary>
+</entry>
+<entry>
     <title>Monoids, Newtypes and the Evil Human Resources Dept.</title>
     <link href="http://fundeps.com/posts/haskell/2014-03-12-Monoids-Newtypes-and-HR/index.html" />
     <id>http://fundeps.com/posts/haskell/2014-03-12-Monoids-Newtypes-and-HR/index.html</id>
