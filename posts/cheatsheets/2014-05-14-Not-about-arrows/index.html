@@ -189,7 +189,7 @@
 <h2 id="about">About</h2>
 <p>This post is not about arrows <em>per se</em>.</p>
 <p>In fact, while arrows are seen as <a href="http://www.haskell.org/arrows/">“a new abstract view of computation (…) as monads (…) but more general”</a>, many Haskell users <em>don’t really care for this</em>. They just use <em>some arrow functions</em> because they implement useful <a href="http://hackage.haskell.org/package/base-4.7.0.0/docs/Data-Either.html">Either</a> and <a href="http://hackage.haskell.org/package/base-4.7.0.0/docs/Data-Tuple.html">Tuple</a> combinators.</p>
-<p>While there are already <a href="https://en.wikibooks.org/wiki/Haskell/Understanding_arrows">good</a> arrow tutorials, if you’re a begginer, you’ll probably gloss over them, and conclude they seem over complicated for what you are doing.</p>
+<p>While there are already <a href="https://en.wikibooks.org/wiki/Haskell/Understanding_arrows">good</a> arrow tutorials, if you’re a beginner, you’ll probably gloss over them, and conclude they seem over complicated for what you are doing.</p>
 <p>Heck, don’t even get me started on the <a href="http://hackage.haskell.org/package/base-4.7.0.0/docs/Control-Arrow.html">Control.Arrow module documentation</a>.</p>
 <p>I remember thinking: let me get these monads straight, then monad transformers, those are also quite used, <em>then</em> I’ll consider arrows. And I argue that many haskellers never do get to that point…</p>
 <h2 id="what-am-i-missing">What am I missing?</h2>
@@ -197,7 +197,7 @@
 <p>How is that useful?</p>
 <h3 id="either">Either</h3>
 <p>Many of you have probably wondered why there aren’t functions on <a href="http://hackage.haskell.org/package/base-4.7.0.0/docs/Data-Either.html">base</a> to map the <code>Left</code> part of an Either, or even both <code>Left</code> and <code>Right</code>.</p>
-<p>You are <a href="http://www.haskell.org/pipermail/libraries/2014-April/022679.html">not</a> <a href="https://stackoverflow.com/questions/13503965/mapping-over-eithers-left">alone</a>. My guess is that this question will just keep on poping until proper documentation is added to Data.Either.</p>
+<p>You are <a href="http://www.haskell.org/pipermail/libraries/2014-April/022679.html">not</a> <a href="https://stackoverflow.com/questions/13503965/mapping-over-eithers-left">alone</a>. My guess is that this question will just keep on popping until proper documentation is added to Data.Either.</p>
 <p>While you might later find these defined in the very useful module <a href="http://hackage.haskell.org/package/either">either</a>, namely <a href="http://hackage.haskell.org/package/either-4.1.1/docs/Data-Either-Combinators.html">Data.Either.Combinators</a>, as <a href="https://hackage.haskell.org/package/either-4.1.1/docs/Data-Either-Combinators.html#v:mapLeft">mapLeft</a> and <a href="http://hackage.haskell.org/package/either-4.1.1/docs/Data-Either-Combinators.html#v:mapBoth">mapBoth</a>, what you might miss is that you don’t require an extra package to get this: you can use <code>Control.Arrow</code> from base!</p>
 <pre class="sourceCode Haskell"><code class="sourceCode haskell"><span class="co">-- Apply a function  to the left side of an Either</span>
 <span class="co">-- The same as 'mapLeft' from Data.Either.Combinators</span>
@@ -217,7 +217,7 @@
 <span class="co">-- The same as 'either'</span>
 <span class="ot">(|||) ::</span> (b <span class="ot">-&gt;</span> d) <span class="ot">-&gt;</span> (c <span class="ot">-&gt;</span> d) <span class="ot">-&gt;</span> <span class="dt">Either</span> b c <span class="ot">-&gt;</span> d</code></pre>
 <h3 id="tuple-pair">2-Tuple (Pair)</h3>
-<p>Another usefull set of arrow combinators applies to Tuples:</p>
+<p>Another useful set of arrow combinators applies to Tuples:</p>
 <pre class="sourceCode Haskell"><code class="sourceCode haskell"><span class="co">-- Apply a function to first pair element</span>
 <span class="ot">first ::</span> (b <span class="ot">-&gt;</span> c) <span class="ot">-&gt;</span> (b,d) <span class="ot">-&gt;</span> (c,d)
 
@@ -385,7 +385,7 @@ main <span class="fu">=</span> <span class="kw">do</span>
 <span class="ot">      ::</span> (<span class="ot">-&gt;</span>) b c <span class="ot">-&gt;</span> (<span class="ot">-&gt;</span>) b c' <span class="ot">-&gt;</span> (<span class="ot">-&gt;</span>) b    (c, c')
 <span class="ot">      ::</span> (b <span class="ot">-&gt;</span> c) <span class="ot">-&gt;</span> (b <span class="ot">-&gt;</span> c') <span class="ot">-&gt;</span>      b <span class="ot">-&gt;</span> (c, c')</code></pre>
 <h2 id="is-this-the-right-abstraction">Is this the right abstraction?</h2>
-<p>The <a href="http://www.haskell.org/pipermail/libraries/2014-April/022777.html">current</a> <a href="http://www.haskell.org/pipermail/libraries/2014-April/022844.html">effort</a> to add more straigh forward functions to <code>Data.Either</code> and <code>Data.Tuple</code> ended with the conclusiong that <a href="http://hackage.haskell.org/package/bifunctors-3.2.0.1/docs/Data-Bifunctor.html">Bifunctors</a> should be added to base.</p>
+<p>The <a href="http://www.haskell.org/pipermail/libraries/2014-April/022777.html">current</a> <a href="http://www.haskell.org/pipermail/libraries/2014-April/022844.html">effort</a> to add more straight forward functions to <code>Data.Either</code> and <code>Data.Tuple</code> ended with the conclusiong that <a href="http://hackage.haskell.org/package/bifunctors-3.2.0.1/docs/Data-Bifunctor.html">Bifunctors</a> should be added to base.</p>
 <p>Bifunctors are really nice, and a much more (IMHO) logical way to present these operators. Take any given type constructor that parameterizes over two types, make it pass some very obvious rules (<code>bimap id id ≡ id</code>), and you got yourself something that it is just like a <code>Functor</code>, but for “bi-types”.</p>
 <p>So, <code>Either</code> is an instance, and so is <code>(,)</code>. And the equivalent functions are the very obvious:</p>
 <pre class="sourceCode Haskell"><code class="sourceCode haskell"><span class="kw">class</span> <span class="dt">Bifunctor</span> p <span class="kw">where</span>
@@ -398,7 +398,7 @@ main <span class="fu">=</span> <span class="kw">do</span>
     <span class="co">-- | Map covariantly over the second argument.</span>
 <span class="ot">    second ::</span> (b <span class="ot">-&gt;</span> c) <span class="ot">-&gt;</span> p a b <span class="ot">-&gt;</span> p a c</code></pre>
 <p>While this is, IMHO, not a bad outcome at all, I still feel that more straight-forward functions on <code>Data.Either</code> and <code>Data.Tuple</code> would do more good than harm, namely easing the way for Haskell newbies.</p>
-<p>But the <code>Bifunctor</code> is a very usefull (and logical) abstraction, and it is definitelly most welcomed.</p>
+<p>But the <code>Bifunctor</code> is a very useful (and logical) abstraction, and it is definitely most welcomed.</p>
 <h2 id="cheatsheet">Cheatsheet</h2>
 <p>So, arrows operators can be quite useful for types that are parameterized over two types: <a href="http://hackage.haskell.org/package/base-4.7.0.0/docs/Data-Either.html">Either</a> for choice, <a href="http://hackage.haskell.org/package/base-4.7.0.0/docs/Data-Tuple.html">Tuple</a> for combinations.</p>
 <table class="table table-striped">
