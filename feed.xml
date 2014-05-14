@@ -30,7 +30,7 @@
 * [Cheatsheet](#cheatsheet)
 -->
 
-<h2 id="not-about-arrows">Not about arrows</h2>
+<h2 id="about">About</h2>
 <p>This post is not about arrows <em>per se</em>.</p>
 <p>In fact, while arrows are seen as <a href="http://www.haskell.org/arrows/">“a new abstract view of computation (…) as monads (…) but more general”</a>, many Haskell users <em>don’t really care for this</em>. They just use <em>some arrow functions</em> because they implement useful <a href="http://hackage.haskell.org/package/base-4.7.0.0/docs/Data-Either.html">Either</a> and <a href="http://hackage.haskell.org/package/base-4.7.0.0/docs/Data-Tuple.html">Tuple</a> combinators.</p>
 <p>While there are already <a href="https://en.wikibooks.org/wiki/Haskell/Understanding_arrows">good</a> arrow tutorials, if you’re a begginer, you’ll probably gloss over them, and conclude they seem over complicated for what you are doing.</p>
