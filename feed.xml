@@ -8,8 +8,128 @@
         <name>Joao Cristovao</name>
         <email>jmacristovao@gmail.com</email>
     </author>
-    <updated>2014-05-14T00:00:00Z</updated>
+    <updated>2014-05-24T00:00:00Z</updated>
     <entry>
+    <title>An experiment with typed time</title>
+    <link href="http://fundeps.com/posts/haskell/2014-05-24-An-Experiment-with-Typed-Time/index.html" />
+    <id>http://fundeps.com/posts/haskell/2014-05-24-An-Experiment-with-Typed-Time/index.html</id>
+    <published>2014-05-24T00:00:00Z</published>
+    <updated>2014-05-24T00:00:00Z</updated>
+    <summary type="html"><![CDATA[<p><em>tl;dr:</em> Using the <a href="http://hackage.haskell.org/package/units">units</a> package for correctly specifying delays</p>
+<h2 id="motivation">Motivation</h2>
+<p>So, I was doing some experiences with the <a href="http://hackage.haskell.org/package/retry">Retry</a> module, that accepts a base delay as an <code>Int</code> in <em>milliseconds</em>. Then, I was testing this with <code>threadDelay</code> which accepts <em>microseconds</em>.</p>
+<p>But the code I was working on actually required delays in the order of seconds, and perhaps even minutes.</p>
+<p>As you can now probably guess, this is asking for trouble.</p>
+<h2 id="naive-solution">Naive solution</h2>
+<p>Well, I could just define functions like these:</p>
+<pre class="sourceCode Haskell"><code class="sourceCode haskell"><span class="co">-- Convert seconds to milliseconds</span>
+<span class="ot">secondsToMs ::</span> <span class="dt">Int</span> <span class="ot">-&gt;</span> <span class="dt">Int</span>
+secondsToMs <span class="fu">=</span> (<span class="fu">*</span><span class="dv">1000</span>)
+
+<span class="co">-- Convert seconds do microseconds</span>
+<span class="ot">secondsToUs ::</span> <span class="dt">Int</span> <span class="ot">-&gt;</span> <span class="dt">Int</span>
+secondsToUs <span class="fu">=</span> (<span class="fu">*</span><span class="dv">1000000</span>)</code></pre>
+<p>But this is still asking for trouble. Nothing is stopping me from mixing seconds with milliseconds with microseconds. Besides, having <code>toUs</code> just feels wrong :P</p>
+<h2 id="libraries-ahoy">Libraries ahoy</h2>
+<p>Looking in hackage for more type safe solutions yields a lot of libraries. I’ll focus first in two time specific libraries:</p>
+<h3 id="tiempo"><a href="https://hackage.haskell.org/package/tiempo">tiempo</a></h3>
+<p>Tiempo, found <a href="https://hackage.haskell.org/package/tiempo">here</a> seems to be just a proof-of-concept on expanding the implementation I presented above.</p>
+<p>You do get a specific type, <code>TimeInterval</code>, and functions to convert to and from.</p>
+<p>However, its interface is far from uniform:</p>
+<pre class="sourceCode Haskell"><code class="sourceCode haskell"><span class="ot">toMicroSeconds ::</span> <span class="dt">TimeInterval</span> <span class="ot">-&gt;</span> <span class="dt">Int</span>
+<span class="ot">toMilliSeconds ::</span> <span class="dt">TimeInterval</span> <span class="ot">-&gt;</span> <span class="dt">Double</span>
+<span class="ot">toSeconds      ::</span> <span class="dt">TimeInterval</span> <span class="ot">-&gt;</span> <span class="dt">Double</span></code></pre>
+<p>While I can see why they did this - some base functions dealing with delays use <code>Int</code> as microseconds -, it doesn’t feel clean.</p>
+<p>Also, there is no <code>Num</code> instance, thus you can’t even add or subtract <code>TimeInterval</code>s.</p>
+<p>However, there is one thing I like in this library: it redefines the <code>threadDelay</code> and <code>timeout</code> functions to accept a TimeInterval, which is one of my goals.</p>
+<h3 id="time-units"><a href="https://hackage.haskell.org/package/time-units">time-units</a></h3>
+<p>This library, found <a href="https://hackage.haskell.org/package/time-units">here</a>, seems to get some things right. A <code>Num</code> instance makes it easy to declare values:</p>
+<pre class="sourceCode Haskell"><code class="sourceCode haskell"><span class="kw">import </span><span class="dt">Data.Time.Units</span>
+
+<span class="kw">let</span> x <span class="fu">=</span> <span class="dv">5</span><span class="ot"> ::</span> <span class="dt">Second</span>
+print x
+<span class="fu">&gt;</span> 5s</code></pre>
+<p>And there are separate data types for seconds, minutes, etc, so you can’t accidentally mix them up. You can use the <code>convertUnit</code> to perform (sometimes lossy) conversions.</p>
+<p>But, this does imply a somewhat bulky way of adding up times:</p>
+<pre class="sourceCode Haskell"><code class="sourceCode haskell"><span class="kw">import </span><span class="dt">Data.Time.Units</span>
+
+<span class="kw">let</span> x <span class="fu">=</span> convertUnit ((<span class="dv">5</span><span class="ot"> ::</span> <span class="dt">Millisecond</span>) <span class="fu">+</span> convertUnit (<span class="dv">6</span><span class="ot"> ::</span> <span class="dt">Second</span>))<span class="ot"> ::</span> <span class="dt">Microsecond</span>
+<span class="fu">&gt;</span> <span class="dv">6005000</span>µs</code></pre>
+<h2 id="general-unit-libraries">General unit libraries</h2>
+<p>Next, I finally stumbled on <a href="http://www.haskell.org/haskellwiki/Physical_units">www.haskell.org/haskellwiki/Physical_units</a>. There are <em>lots</em> of libraries for achiving this, and to be honest, I was a little bit lost.</p>
+<p>And if you are hopping for a detailed technical explanation regarding my following choice, I am afraid I don’t have one. I just choose one which seemed to be actively developed, and was mainly focused on unit support. And, of course, that was usable by a dumb guy like me.</p>
+<p>Thus, I ended up choosing <a href="http://www.cis.upenn.edu/~eir/packages/units/">units</a> over <a href="http://hackage.haskell.org/package/unittyped">unittyped</a> mainly because the later only has one release in Hackage.</p>
+<h3 id="units"><a href="http://hackage.haskell.org/package/units">Units</a></h3>
+<p>This library is actually split in two:</p>
+<ul>
+<li><a href="http://hackage.haskell.org/package/units">units</a> : implements all the Units type hackery. Its type signatures do seem a little daunting, but if you stick with the functions I’ll describe next, you should not have a problem.</li>
+<li><a href="https://hackage.haskell.org/package/units-defs">units-defs</a> : The above library does not actually define any Unit besides the very generic Scalar. But you can import units-defs to have access to most (all?) units you might want.</li>
+</ul>
+<h4 id="minimum-viable-set-of-functions">Minimum viable set of functions</h4>
+<p>So, you want to use time. Fine:</p>
+<pre class="sourceCode Haskell"><code class="sourceCode haskell"><span class="kw">import </span><span class="dt">Data.Metrology</span>
+<span class="kw">import </span><span class="dt">Data.Metrology.SI</span>
+<span class="kw">import </span><span class="dt">Data.Metrology.Show</span>
+
+<span class="kw">let</span> x <span class="fu">=</span> <span class="dv">5</span> <span class="fu">%%</span> <span class="dt">Second</span>
+<span class="kw">let</span> y <span class="fu">=</span> <span class="dv">6</span> <span class="fu">%%</span> milli <span class="dt">Second</span>
+<span class="kw">let</span> z <span class="fu">=</span> x <span class="fu">|+|</span> y 
+z
+<span class="fu">&gt;</span> <span class="dv">5</span><span class="fu">.</span><span class="dv">006</span> s</code></pre>
+<p>Looks great! What if I want the results in microseconds?</p>
+<pre class="sourceCode Haskell"><code class="sourceCode haskell"><span class="kw">let</span> ms <span class="fu">=</span> z <span class="st">## micro Second</span>
+<span class="fu">&gt;</span> <span class="dv">5006000</span><span class="fu">.</span><span class="dv">0</span></code></pre>
+<p>Even better! As you can see, with this solution you can freely mix different values of the same physical quantity, and you always get a correct result. And you can easily convert the final result to the format of your preference.</p>
+<p>While there is no <code>Num</code> instance, the <code>|+|</code>, <code>|*|</code>, etc operators do everything you might need.</p>
+<p>Thus, while the type signatures do seem a little daunting, the actual use is quite easy!</p>
+<p>A notorious disadvantage of this solution is that it uses <a href="http://www.haskell.org/haskellwiki/GHC/Type_families#Closed_family_simplification">closed type families</a>, and thus <a href="https://github.com/goldfirere/units/issues/1">it only supports GHC 7.8.2+</a>. But if you are not bound to a specific GHC version, this is not a major limitation.</p>
+<h4 id="implementating-threaddelay">Implementating threadDelay</h4>
+<p>So, can we implement a threadDelay which accepts <code>Time</code> as the delay unit?</p>
+<p>Yes, let me show you how:</p>
+<pre class="sourceCode Haskell"><code class="sourceCode haskell"><span class="ot">{-# LANGUAGE TypeFamilies  #-}</span>
+<span class="kw">module</span> <span class="dt">Control.Concurrent.Units</span>
+  ( threadDelay
+  , milli
+  , micro
+  ) <span class="kw">where</span>
+
+<span class="kw">import qualified</span> <span class="dt">Control.Concurrent</span> <span class="kw">as</span> <span class="dt">Conc</span>
+<span class="kw">import </span><span class="dt">Data.Metrology</span>
+<span class="kw">import </span><span class="dt">Data.Metrology.SI</span>
+
+<span class="co">-- | Modified thread delay that accepts Time.</span>
+<span class="ot">threadDelay ::</span> <span class="dt">Time</span> <span class="ot">-&gt;</span> <span class="dt">IO</span> ()
+threadDelay t <span class="fu">=</span> Conc.threadDelay (truncate(t <span class="st">## micro Second))</span></code></pre>
+<p>So, this is really quite simple, <code>## micro Second</code> converts the result into a (<a href="http://hackage.haskell.org/package/base-4.7.0.0/docs/Prelude.html#t:Fractional">Fractional</a>) representation, and then <code>round</code> converts it to an <code>Int</code> acceptable by the <em>old</em> threadDelay (note that round may lose precision).</p>
+<h4 id="and-what-about-minutes-and-hours">And what about minutes and hours</h4>
+<p>Well, the SI does not define minutes and hours, only seconds. And lets face it, nobody uses <code>kilo seconds</code>.</p>
+<p>So, lets add them to our little module:</p>
+<pre class="sourceCode Haskell"><code class="sourceCode haskell"><span class="kw">data</span> <span class="dt">Minute</span> <span class="fu">=</span> <span class="dt">Minute</span>
+<span class="kw">instance</span> <span class="dt">Unit</span> <span class="dt">Minute</span> <span class="kw">where</span>
+  <span class="kw">type</span> <span class="dt">BaseUnit</span> <span class="dt">Minute</span> <span class="fu">=</span> <span class="dt">Second</span>
+  conversionRatio _ <span class="fu">=</span> <span class="dv">60</span>
+<span class="kw">instance</span> <span class="dt">Show</span> <span class="dt">Minute</span> <span class="kw">where</span>
+  show _ <span class="fu">=</span> <span class="st">&quot;min&quot;</span>
+
+<span class="kw">data</span> <span class="dt">Hour</span> <span class="fu">=</span> <span class="dt">Hour</span>
+<span class="kw">instance</span> <span class="dt">Unit</span> <span class="dt">Hour</span> <span class="kw">where</span>
+  <span class="kw">type</span> <span class="dt">BaseUnit</span> <span class="dt">Hour</span> <span class="fu">=</span> <span class="dt">Second</span>
+  conversionRatio _ <span class="fu">=</span> <span class="dv">60</span> <span class="fu">*</span> <span class="dv">60</span>
+<span class="kw">instance</span> <span class="dt">Show</span> <span class="dt">Hour</span> <span class="kw">where</span>
+  show _ <span class="fu">=</span> <span class="st">&quot;hour&quot;</span></code></pre>
+<p>This is just code copied from <a href="https://hackage.haskell.org/package/units-defs">units-defs</a> Originally I defined <code>Minute</code> and <code>Hour</code> as Prefixes, but <code>5 %% hour Second</code> just didn’t feel right. With the above implementation, I can just type:</p>
+<pre class="sourceCode Haskell"><code class="sourceCode haskell">threadDelay (<span class="dv">2</span><span class="fu">.</span><span class="dv">5</span> <span class="fu">%%</span> <span class="dt">Minute</span>)</code></pre>
+<h4 id="is-this-a-good-solution">Is this a good solution?</h4>
+<p>Well… It is a bit overkill, to be honest. And don’t get illusions of precision when dealing with time, and <code>threadDelay</code>: this is not a <a href="http://en.wikipedia.org/wiki/Real-time_operating_system">RTOS</a>. Please note that this has nothing to do with the units package precision, but the actual use of precise time in a non-real-time operating system as Linux, Windows or OSX.</p>
+<p>What this solution <strong>does</strong> allow you is to think naturally in whatever units you prefer, mix them, and have the compiler do the dirty work for you.</p>
+<p>And for me, that’s a good enough advantage!</p>
+<h3 id="addendum">Addendum</h3>
+<ul>
+<li><p><strong>PS1</strong>: After talking with <a href="http://www.cis.upenn.edu/~eir/">Richard Eisenberg</a>, one of the library authors, he <a href="https://github.com/goldfirere/units/issues/16">seems open</a> to exchanging the names of the more polymorphic <code>#</code> and <code>%</code> with the monomorphic <code>##</code> and <code>%%</code>. If you have no idea what this means, its simple: the monomorphic will guess your type much easier, without explicit type annotations. But in the presence of proper type annotations, they should behave the same.</p></li>
+<li><p><strong>PS2</strong>: If your interested in this kind of mathematical libraries, one other very popular library seems to be the <a href="https://hackage.haskell.org/package/numeric-prelude">numeric-prelude</a>, but this is a much more general library…</p></li>
+</ul>]]></summary>
+</entry>
+<entry>
     <title>Not about arrows</title>
     <link href="http://fundeps.com/posts/cheatsheets/2014-05-14-Not-about-arrows/index.html" />
     <id>http://fundeps.com/posts/cheatsheets/2014-05-14-Not-about-arrows/index.html</id>

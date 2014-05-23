@@ -4,7 +4,7 @@
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
     <meta charset="utf-8">
  	
-				<meta name="keywords" content="Arrow,Either,alt,apply,bind,cheatcheets,cheatsheet,functions,haskell,monoid,newtype,semigroup,typeclass">
+				<meta name="keywords" content="Arrow,Either,alt,apply,bind,cheatcheets,cheatsheet,closed type families,functions,haskell,monoid,newtype,semigroup,time,typeclass,units">
 
 	
 	<meta name="description" content="A Functional Dependency: an Haskell Blog for the novice to intermediate user" />
@@ -14,7 +14,7 @@
     <link href="http://fonts.googleapis.com/css?family=Ubuntu" rel="stylesheet" type="text/css">
     <link href="http://fonts.googleapis.com/css?family=Oxygen" rel="stylesheet" type="text/css">
     <!-- Bootstrap -->
-    <link href="../../../css/bootstrap.min.css" rel="stylesheet">
+    <link href="../../../css/bootstrap.css" rel="stylesheet">
     <link href="../../../css/syntax.css" rel="stylesheet">
     <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
     <script src="https://code.jquery.com/jquery.js"></script>
@@ -127,7 +127,7 @@
         </div>
 		<div class="row-center-block">
 			
-				<a href="../../../tags/cheatsheets.html">cheatsheets (1)</a><br /> <a href="../../../tags/haskell.html">haskell (4)</a>
+				<a href="../../../tags/cheatsheets.html">cheatsheets (2)</a><br /> <a href="../../../tags/haskell.html">haskell (4)</a>
 			
 	    <div class="row-center-block">
           <h3>
@@ -135,7 +135,7 @@
 		  </h3>
         </div>
 			
-				<a href="../../../tags/haskell.html">haskell (5)</a><br /> <a href="../../../tags/monoid.html">monoid (2)</a><br /> <a href="../../../tags/typeclass.html">typeclass (2)</a><br /> <a href="../../../tags/Arrow.html">Arrow (1)</a><br /> <a href="../../../tags/Either.html">Either (1)</a><br /> <a href="../../../tags/alt.html">alt (1)</a><br /> <a href="../../../tags/apply.html">apply (1)</a><br /> <a href="../../../tags/bind.html">bind (1)</a><br /> <a href="../../../tags/cheatcheets.html">cheatcheets (1)</a><br /> <a href="../../../tags/cheatsheet.html">cheatsheet (1)</a>
+				<a href="../../../tags/haskell.html">haskell (6)</a><br /> <a href="../../../tags/cheatsheet.html">cheatsheet (2)</a><br /> <a href="../../../tags/monoid.html">monoid (2)</a><br /> <a href="../../../tags/typeclass.html">typeclass (2)</a><br /> <a href="../../../tags/Arrow.html">Arrow (1)</a><br /> <a href="../../../tags/Either.html">Either (1)</a><br /> <a href="../../../tags/alt.html">alt (1)</a><br /> <a href="../../../tags/apply.html">apply (1)</a><br /> <a href="../../../tags/bind.html">bind (1)</a><br /> <a href="../../../tags/cheatcheets.html">cheatcheets (1)</a>
 			
 		</div>
         <div class="row-center-block">
@@ -332,11 +332,26 @@ addNDouble' f <span class="fu">=</span> (f <span class="dv">5</span>) <span clas
 <p>So, while I might have overreacted at start, in practice your are only allowed to use postfix operators with partially applied binary operators, a use case where you normally use prefix operators.</p>
 <p>So, this is mainly useless IMHO (and non-idiomatic Haskell), but feel free to use it :)</p>
 <h3 id="basics-part-ix-lambdas">Basics (Part IX) | Lambdas</h3>
-<p>foo x y = x *y</p>
-<p>is the same as</p>
-<p>foo x= -&gt; x*y</p>
-<p>and</p>
-<p>foo = -&gt; -&gt; x*y</p>
+<p>So far we only dealt with named functions with all parameters fully specified. Haskell is one of several languages to offer anonymous functions.</p>
+<p>Well then… what is an anonymous function, and what is it good for?</p>
+<p>An anonymous function is a function definition that does not require a name (thus the anonymous part, duh), and its mostly useful anywhere you need a function (namely other function parameters that expect a function) but you don’t feel the need to properly define a separate function, because you will not use this (anonymous) function again.</p>
+<p>But the current syntax does not allow for such a function to be defined, so we need a bit of extra syntax:</p>
+<pre class="sourceCode Haskell"><code class="sourceCode haskell">foo x y <span class="fu">=</span> x <span class="fu">*</span>y
+
+<span class="co">-- is the same as</span>
+
+foo x<span class="fu">=</span> \y <span class="ot">-&gt;</span> x<span class="fu">*</span>y
+
+<span class="co">-- and is the same as</span>
+foo <span class="fu">=</span> \x <span class="ot">-&gt;</span> \y <span class="ot">-&gt;</span> x<span class="fu">*</span>y</code></pre>
+<p>And there you go… <code>\x -&gt; \y -&gt; x * y</code> is an anonymous function, that takes two parameters.</p>
+<p>For comodity sake, you can simplify this to <code>\x y -&gt; x * y</code>, it is the same thing. But, as expected, <code>\(x,y) -&gt; x * y</code> is not. The first function expects two parameters, the second expects a single parameter, which happens to be a two element tuple (pair). It is easy to get confused if you’re comming from other programming language.</p>
+<h4 id="example">Example</h4>
+<p>Take the <code>comparing</code> function from <code>Data.Ord</code>:</p>
+<pre class="sourceCode Haskell"><code class="sourceCode haskell"><span class="ot">comparing ::</span> <span class="dt">Ord</span> a <span class="ot">=&gt;</span> (b <span class="ot">-&gt;</span> a) <span class="ot">-&gt;</span> b <span class="ot">-&gt;</span> b <span class="ot">-&gt;</span> <span class="dt">Ordering</span></code></pre>
+<p>It accepts a function that transforms a type <code>b</code>, possibly even without an <code>Ord</code> instance, into another type <code>a</code>, which in turn is suitable for comparison. Then it also accepts two <code>b</code>’s, and it returns the result of their comparison, once they’ve been transformed into <code>a</code>.</p>
+<p>This is excelent for comparing complex records based on only one of its fields, for example:</p>
+<pre class="sourceCode Haskell"><code class="sourceCode haskell"></code></pre>
 <h2 id="data.function-1">Data.Function</h2>
 <h3 id="id"><a href="http://hackage.haskell.org/package/base-4.7.0.0/docs/Data-Function.html#v:id">id</a></h3>
 <p>The simplest of functions: <strong>identity</strong>. Usefull whenever a given function expects another function as one of its parameters, but you want to preserve the value being processes.</p>
