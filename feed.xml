@@ -56,7 +56,7 @@ print x
 <span class="kw">let</span> x <span class="fu">=</span> convertUnit ((<span class="dv">5</span><span class="ot"> ::</span> <span class="dt">Millisecond</span>) <span class="fu">+</span> convertUnit (<span class="dv">6</span><span class="ot"> ::</span> <span class="dt">Second</span>))<span class="ot"> ::</span> <span class="dt">Microsecond</span>
 <span class="fu">&gt;</span> <span class="dv">6005000</span>µs</code></pre>
 <h2 id="general-unit-libraries">General unit libraries</h2>
-<p>Next, I finally stumbled on <a href="http://www.haskell.org/haskellwiki/Physical_units">www.haskell.org/haskellwiki/Physical_units</a>. There are <em>lots</em> of libraries for achiving this, and to be honest, I was a little bit lost.</p>
+<p>Next, I finally stumbled on <a href="http://www.haskell.org/haskellwiki/Physical_units">www.haskell.org/haskellwiki/Physical_units</a>. There are <em>lots</em> of libraries for achieving this, and to be honest, I was a little bit lost.</p>
 <p>And if you are hopping for a detailed technical explanation regarding my following choice, I am afraid I don’t have one. I just choose one which seemed to be actively developed, and was mainly focused on unit support. And, of course, that was usable by a dumb guy like me.</p>
 <p>Thus, I ended up choosing <a href="http://www.cis.upenn.edu/~eir/packages/units/">units</a> over <a href="http://hackage.haskell.org/package/unittyped">unittyped</a> mainly because the later only has one release in Hackage.</p>
 <h3 id="units"><a href="http://hackage.haskell.org/package/units">Units</a></h3>
