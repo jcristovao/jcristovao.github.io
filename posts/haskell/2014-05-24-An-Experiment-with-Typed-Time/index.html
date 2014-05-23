@@ -239,7 +239,7 @@ z
 <p>While there is no <code>Num</code> instance, the <code>|+|</code>, <code>|*|</code>, etc operators do everything you might need.</p>
 <p>Thus, while the type signatures do seem a little daunting, the actual use is quite easy!</p>
 <p>A notorious disadvantage of this solution is that it uses <a href="http://www.haskell.org/haskellwiki/GHC/Type_families#Closed_family_simplification">closed type families</a>, and thus <a href="https://github.com/goldfirere/units/issues/1">it only supports GHC 7.8.2+</a>. But if you are not bound to a specific GHC version, this is not a major limitation.</p>
-<h4 id="implementating-threaddelay">Implementating threadDelay</h4>
+<h4 id="implementing-threaddelay">Implementing threadDelay</h4>
 <p>So, can we implement a threadDelay which accepts <code>Time</code> as the delay unit?</p>
 <p>Yes, let me show you how:</p>
 <pre class="sourceCode Haskell"><code class="sourceCode haskell"><span class="ot">{-# LANGUAGE TypeFamilies  #-}</span>
