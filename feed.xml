@@ -125,8 +125,8 @@ threadDelay t <span class="fu">=</span> Conc.threadDelay (truncate(t <span class
 <p>And for me, that’s a good enough advantage!</p>
 <h3 id="addendum">Addendum</h3>
 <ul>
-<li><p><strong>PS1</strong>: After talking with <a href="http://www.cis.upenn.edu/~eir/">Richard Eisenberg</a>, one of the library authors, he <a href="https://github.com/goldfirere/units/issues/16">seems open</a> to exchanging the names of the more polymorphic <code>#</code> and <code>%</code> with the monomorphic <code>##</code> and <code>%%</code>. If you have no idea what this means, its simple: the monomorphic will guess your type much easier, without explicit type annotations. But in the presence of proper type annotations, they should behave the same.</p></li>
-<li><p><strong>PS2</strong>: If your interested in this kind of mathematical libraries, one other very popular library seems to be the <a href="https://hackage.haskell.org/package/numeric-prelude">numeric-prelude</a>, but this is a much more general library…</p></li>
+<li><p><strong>PS1</strong>: After talking with <a href="http://www.cis.upenn.edu/~eir/">Richard Eisenberg</a>, one of the library authors, he <a href="https://github.com/goldfirere/units/issues/16">seems open</a> to exchanging the names of the more polymorphic <code>#</code> and <code>%</code> with the monomorphic <code>##</code> and <code>%%</code>. If you have no idea what this means, it is simple: the monomorphic will guess your type much easier, without explicit type annotations. But in the presence of proper type annotations, they should behave the same.</p></li>
+<li><p><strong>PS2</strong>: If your interested in this kind of mathematical libraries, two other very popular libraries seems to be the <a href="https://hackage.haskell.org/package/numeric-prelude">numeric-prelude</a> and <a href="https://hackage.haskell.org/package/algebra">algebra</a> but these are much more general libraries…</p></li>
 </ul>]]></summary>
 </entry>
 <entry>
